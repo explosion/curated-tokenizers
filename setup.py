@@ -3,9 +3,10 @@ from __future__ import print_function
 import os
 import sys
 
-from setuptools import Extension, setup, find_packages
+from setuptools import Extension, find_packages
 from Cython.Build import cythonize
 
+from skbuild import setup
 
 PACKAGES = find_packages()
 MOD_NAMES = ["cysp.sp"]
