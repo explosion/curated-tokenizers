@@ -9,4 +9,4 @@ add_library(sp MODULE ${sp})
 add_dependencies(sp sentencepiece)
 python_extension_module(sp)
 
-#install(TARGETS sp LIBRARY DESTINATION sp)
+install(TARGETS sp LIBRARY DESTINATION cysp)

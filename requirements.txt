@@ -1,4 +1,5 @@
 # Build dependencies
+cmake
 cython>=0.25
 ninja
 scikit-build
