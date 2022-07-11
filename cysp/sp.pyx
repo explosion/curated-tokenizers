@@ -19,12 +19,8 @@ cdef class Processor:
 
         return processor
 
-    def encode(self, sentence):
-        sentence_bytes = sentence.encode("utf-8")
-        cdef SentencePieceText text;
-        cdef Status status = deref(self.spp).Encode(sentence.encode("utf-8"), &text)
-        if <int> status.code() != <int> kOk:
-            raise ValueError(status.error_message().decode("utf-8"))
+    def encode(self, str sentence):
+        cdef SentencePieceText text = self._encode(sentence)
 
         cdef int idx
         cdef SentencePieceText_SentencePiece piece
@@ -36,3 +32,33 @@ cdef class Processor:
             pieces.append(piece.piece().decode("utf-8"))
 
         return ids, pieces
+
+    def encode_as_ids(self, str sentence):
+        cdef SentencePieceText text = self._encode(sentence)
+
+        cdef int idx
+        cdef np.ndarray[uint32_t] ids = numpy.empty((text.pieces_size()), dtype="uint32")
+        for idx in range(text.pieces_size()):
+            (<uint32_t *> ids.data)[idx] = text.pieces(idx).id()
+
+        return ids
+
+    def encode_as_pieces(self, str sentence):
+        cdef SentencePieceText text = self._encode(sentence)
+
+        cdef int idx
+        cdef SentencePieceText_SentencePiece piece
+        pieces = []
+        for idx in range(text.pieces_size()):
+            piece = text.pieces(idx)
+            pieces.append(text.pieces(idx).piece().decode("utf-8"))
+
+        return pieces
+
+    cdef SentencePieceText _encode(self, str sentence):
+        sentence_bytes = sentence.encode("utf-8")
+        cdef SentencePieceText text;
+        cdef Status status = deref(self.spp).Encode(sentence.encode("utf-8"), &text)
+        if <int> status.code() != <int> kOk:
+            raise ValueError(status.error_message().decode("utf-8"))
+        return text
