@@ -2,6 +2,7 @@
 cmake
 cython>=0.25
 ninja
+numpy
 scikit-build
 wheel
 

@@ -1,4 +1,6 @@
 from cython.operator cimport dereference as deref
+cimport numpy as np
+import numpy
 
 cdef class Processor:
     def __cinit__(self):
@@ -26,11 +28,11 @@ cdef class Processor:
 
         cdef int idx
         cdef SentencePieceText_SentencePiece piece
-        ids = []
+        cdef np.ndarray[uint32_t] ids = numpy.empty((text.pieces_size()), dtype="uint32")
         pieces = []
         for idx in range(text.pieces_size()):
             piece = text.pieces(idx)
-            ids.append(piece.id())
+            (<uint32_t *> ids.data)[idx] = piece.id()
             pieces.append(piece.piece().decode("utf-8"))
 
         return ids, pieces
