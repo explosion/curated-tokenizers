@@ -12,6 +12,7 @@ link_directories(${CMAKE_BINARY_DIR}/sentencepiece/src)
 add_cython_target(sp CXX)
 add_library(sp MODULE ${sp})
 add_dependencies(sp sentencepiece-static)
+target_include_directories(sp PRIVATE ${NumPy_INCLUDE_DIRS})
 target_link_libraries(sp sentencepiece-static)
 python_extension_module(sp)
 
