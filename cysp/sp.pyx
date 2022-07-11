@@ -10,14 +10,25 @@ cdef class Processor:
         raise TypeError("This class cannot be instantiated directly.")
 
     @staticmethod
-    def load_file(str filename):
+    def from_file(str filename):
         cdef Processor processor = Processor.__new__(Processor)
-
         cdef Status status = deref(processor.spp).Load(filename.encode("utf-8"))
         if <int> status.code() != <int> kOk:
             raise OSError(status.error_message().decode("utf-8"))
-
         return processor
+
+    @staticmethod
+    def from_protobuf(bytes protobuf):
+        cdef Processor processor = Processor.__new__(Processor)
+        cdef string_view protobuf_view = string_view(protobuf, len(protobuf))
+        cdef Status status = deref(processor.spp).LoadFromSerializedProto(protobuf_view)
+        if <int> status.code() != <int> kOk:
+            raise ValueError(status.error_message().decode("utf-8"))
+        return processor
+
+    def to_protobuf(self):
+        cdef string serialized = deref(self.spp).serialized_model_proto()
+        return bytes(serialized)
 
     def encode(self, str sentence):
         cdef SentencePieceText text = self._encode(sentence)

@@ -17,7 +17,16 @@ cdef extern from "sentencepiece_processor.h" namespace "sentencepiece":
         SentencePieceProcessor()
         string EncodeAsSerializedProto(const string& filename)
         Status Encode(const string& input, SentencePieceText * spt)
-        Status Load(string filename)
+        Status Load(const string& filename)
+        Status LoadFromSerializedProto(string_view serialized);
+        string serialized_model_proto() const
+
+
+cdef extern from "sentencepiece_processor.h" namespace "absl":
+    cdef cppclass string_view:
+        string_view()
+        string_view(const char * data, size_t len)
+
 
 cdef extern from "sentencepiece_processor.h" namespace "sentencepiece::util":
     # Cython 3.0 has support for C++ enum classes. Until then, work around it.

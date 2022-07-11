@@ -12,12 +12,21 @@ def test_dir(request):
 
 @pytest.fixture
 def toy_model(test_dir):
-    return Processor.load_file(str(test_dir / "toy.model"))
+    return Processor.from_file(str(test_dir / "toy.model"))
+
+
+def test_load_proto(test_dir):
+    with open(str(test_dir / "toy.model"), "rb") as f:
+        data = f.read()
+    spp = Processor.from_protobuf(data)
+    _check_ids(spp)
+    serialized_data = spp.to_protobuf()
+    assert serialized_data == data
 
 
 def test_load_unknown_file():
     with pytest.raises(OSError, match=r"No such file"):
-        Processor.load_file("bogus.model")
+        Processor.from_file("bogus.model")
 
 
 def test_handles_nul_character(toy_model):
@@ -49,10 +58,7 @@ def test_encode(toy_model):
 
 
 def test_encode_as_ids(toy_model):
-    ids = toy_model.encode_as_ids("I saw a girl with a telescope.")
-    numpy.testing.assert_equal(
-        ids, [8, 465, 10, 947, 41, 10, 170, 168, 110, 28, 20, 143, 4]
-    )
+    _check_ids(toy_model)
 
 
 def test_encode_as_pieces(toy_model):
@@ -72,3 +78,10 @@ def test_encode_as_pieces(toy_model):
         "pe",
         ".",
     ]
+
+
+def _check_ids(spp):
+    ids = spp.encode_as_ids("I saw a girl with a telescope.")
+    numpy.testing.assert_equal(
+        ids, [8, 465, 10, 947, 41, 10, 170, 168, 110, 28, 20, 143, 4]
+    )
