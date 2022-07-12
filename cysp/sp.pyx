@@ -85,7 +85,7 @@ cdef class Processor:
 
         return pieces
 
-    cdef SentencePieceText _encode(self, str sentence):
+    cdef SentencePieceText _encode(self, str sentence) except *:
         sentence_bytes = sentence.encode("utf-8")
         cdef SentencePieceText text;
         cdef Status status = deref(self.spp).Encode(sentence.encode("utf-8"), &text)
