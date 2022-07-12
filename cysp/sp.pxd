@@ -48,4 +48,4 @@ cdef extern from "sentencepiece_processor.h" namespace "sentencepiece::util::Sta
 cdef class Processor:
     cdef shared_ptr[SentencePieceProcessor] spp
 
-    cdef SentencePieceText _encode(self, str sentence)
+    cdef SentencePieceText _encode(self, str sentence) except *
