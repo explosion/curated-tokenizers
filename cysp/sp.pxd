@@ -1,6 +1,7 @@
 from libc.stdint cimport uint32_t
 from libcpp.memory cimport shared_ptr
 from libcpp.string cimport string
+from libcpp.vector cimport vector
 
 cdef extern from "builtin_pb/sentencepiece.pb.h" namespace "sentencepiece":
     cdef cppclass SentencePieceText_SentencePiece:
@@ -16,6 +17,8 @@ cdef extern from "sentencepiece_processor.h" namespace "sentencepiece":
     cdef cppclass SentencePieceProcessor:
         SentencePieceProcessor()
         string EncodeAsSerializedProto(const string& filename)
+        Status Decode(const vector[int]& ids, string *detokenized)
+        Status Decode(const vector[string]& ids, string *detokenized)
         Status Encode(const string& input, SentencePieceText * spt)
         Status Load(const string& filename)
         Status LoadFromSerializedProto(string_view serialized);
