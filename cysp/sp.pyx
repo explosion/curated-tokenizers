@@ -36,7 +36,9 @@ cdef class Processor:
         for idx in range(len(ids)):
             c_ids.push_back((<uint32_t *> ids.data)[idx])
         cdef string output
-        deref(self.spp).Decode(c_ids, &output)
+        cdef Status status = deref(self.spp).Decode(c_ids, &output)
+        if <int> status.code() != <int> kOk:
+            raise ValueError(status.error_message().decode("utf-8"))
         return output.decode("utf-8")
 
     def decode_from_pieces(self, list pieces):
@@ -46,7 +48,9 @@ cdef class Processor:
                 raise TypeError("Pieces must be of type `str` when decoding from pieces")
             c_strings.push_back(piece.encode("utf-8"))
         cdef string output
-        deref(self.spp).Decode(c_strings, &output)
+        cdef Status status = deref(self.spp).Decode(c_strings, &output)
+        if <int> status.code() != <int> kOk:
+            raise ValueError(status.error_message().decode("utf-8"))
         return output.decode("utf-8")
 
     def encode(self, str sentence):
