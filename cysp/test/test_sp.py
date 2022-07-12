@@ -117,6 +117,20 @@ def test_encode_as_pieces(toy_model):
     ]
 
 
+def test_uninitialized_model():
+    spp = Processor()
+    with pytest.raises(ValueError):
+        spp.encode("I saw a girl with a telescope.")
+    with pytest.raises(ValueError):
+        spp.encode_as_ids("I saw a girl with a telescope.")
+    with pytest.raises(ValueError):
+        spp.encode_as_pieces("I saw a girl with a telescope.")
+    with pytest.raises(ValueError):
+        spp.decode_from_pieces(["▁I"])
+    with pytest.raises(ValueError):
+        spp.decode_from_ids(numpy.array([8], dtype="uint32"))
+
+
 def _check_ids(spp):
     ids = spp.encode_as_ids("I saw a girl with a telescope.")
     numpy.testing.assert_equal(
