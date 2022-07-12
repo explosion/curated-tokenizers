@@ -4,7 +4,7 @@ requires = [
     "wheel",
     "scikit-build",
     "cmake",
-    "ninja",
+    "ninja; platform_system!='Windows'",
     "numpy",
     "Cython<3.0",
 ]
