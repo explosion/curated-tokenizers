@@ -12,18 +12,14 @@ cdef class Processor:
     @staticmethod
     def from_file(str filename):
         cdef Processor processor = Processor.__new__(Processor)
-        cdef Status status = deref(processor.spp).Load(filename.encode("utf-8"))
-        if <int> status.code() != <int> kOk:
-            raise OSError(status.error_message().decode("utf-8"))
+        _check_status(deref(processor.spp).Load(filename.encode("utf-8")))
         return processor
 
     @staticmethod
     def from_protobuf(bytes protobuf):
         cdef Processor processor = Processor.__new__(Processor)
         cdef string_view protobuf_view = string_view(protobuf, len(protobuf))
-        cdef Status status = deref(processor.spp).LoadFromSerializedProto(protobuf_view)
-        if <int> status.code() != <int> kOk:
-            raise ValueError(status.error_message().decode("utf-8"))
+        _check_status(deref(processor.spp).LoadFromSerializedProto(protobuf_view))
         return processor
 
     def to_protobuf(self):
@@ -36,9 +32,7 @@ cdef class Processor:
         for idx in range(len(ids)):
             c_ids.push_back((<uint32_t *> ids.data)[idx])
         cdef string output
-        cdef Status status = deref(self.spp).Decode(c_ids, &output)
-        if <int> status.code() != <int> kOk:
-            raise ValueError(status.error_message().decode("utf-8"))
+        _check_status(deref(self.spp).Decode(c_ids, &output))
         return output.decode("utf-8")
 
     def decode_from_pieces(self, list pieces):
@@ -48,9 +42,7 @@ cdef class Processor:
                 raise TypeError("Pieces must be of type `str` when decoding from pieces")
             c_strings.push_back(piece.encode("utf-8"))
         cdef string output
-        cdef Status status = deref(self.spp).Decode(c_strings, &output)
-        if <int> status.code() != <int> kOk:
-            raise ValueError(status.error_message().decode("utf-8"))
+        _check_status(deref(self.spp).Decode(c_strings, &output))
         return output.decode("utf-8")
 
     def encode(self, str sentence):
@@ -92,7 +84,16 @@ cdef class Processor:
     cdef SentencePieceText _encode(self, str sentence) except *:
         sentence_bytes = sentence.encode("utf-8")
         cdef SentencePieceText text;
-        cdef Status status = deref(self.spp).Encode(sentence.encode("utf-8"), &text)
-        if <int> status.code() != <int> kOk:
-            raise ValueError(status.error_message().decode("utf-8"))
+        _check_status(deref(self.spp).Encode(sentence.encode("utf-8"), &text))
         return text
+
+cdef _check_status(Status status):
+    cdef code = <int> status.code()
+    if code == <int> kOk:
+        return
+    elif code == <int> kNotFound:
+        raise OSError(status.error_message().decode("utf-8"))
+    elif code == <int> kInternal:
+        raise RuntimeError(status.error_message().decode("utf-8"))
+    else:
+        raise ValueError(status.error_message().decode("utf-8"))
