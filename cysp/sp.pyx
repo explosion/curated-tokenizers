@@ -7,7 +7,7 @@ cdef class Processor:
         self.spp.reset(new SentencePieceProcessor())
 
     def __init__(self):
-        raise TypeError("This class cannot be instantiated directly.")
+        pass
 
     @staticmethod
     def from_file(str filename):
