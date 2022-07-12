@@ -42,8 +42,8 @@ cdef extern from "sentencepiece_processor.h" namespace "sentencepiece::util":
 
 cdef extern from "sentencepiece_processor.h" namespace "sentencepiece::util::StatusCode":
     cdef StatusCode kOk
-
-
+    cdef StatusCode kInternal
+    cdef StatusCode kNotFound
 
 cdef class Processor:
     cdef shared_ptr[SentencePieceProcessor] spp
