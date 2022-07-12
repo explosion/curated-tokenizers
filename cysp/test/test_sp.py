@@ -35,6 +35,43 @@ def test_handles_nul_character(toy_model):
     assert pieces == ["▁T", "est", "\0", "▁", "n", "ul"]
 
 
+def test_decode_from_ids(toy_model):
+    decoded = toy_model.decode_from_ids(
+        numpy.array(
+            [8, 465, 10, 947, 41, 10, 170, 168, 110, 28, 20, 143, 4], dtype="uint32"
+        )
+    )
+    assert decoded == "I saw a girl with a telescope."
+
+
+def test_decode_from_pieces(toy_model):
+    decoded = toy_model.decode_from_pieces(
+        [
+            "▁I",
+            "▁saw",
+            "▁a",
+            "▁girl",
+            "▁with",
+            "▁a",
+            "▁t",
+            "el",
+            "es",
+            "c",
+            "o",
+            "pe",
+            ".",
+        ]
+    )
+    assert decoded == "I saw a girl with a telescope."
+
+
+def test_decode_with_pieces_rejects_inccorect_type(toy_model):
+    with pytest.raises(TypeError):
+        toy_model.decode_from_pieces("test")
+    with pytest.raises(TypeError):
+        toy_model.decode_from_pieces([1, 2, 3])
+
+
 def test_encode(toy_model):
     ids, pieces = toy_model.encode("I saw a girl with a telescope.")
     numpy.testing.assert_equal(

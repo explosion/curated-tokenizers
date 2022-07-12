@@ -30,6 +30,25 @@ cdef class Processor:
         cdef string serialized = deref(self.spp).serialized_model_proto()
         return bytes(serialized)
 
+    def decode_from_ids(self, np.ndarray[uint32_t] ids):
+        cdef vector[int] c_ids
+        cdef int idx
+        for idx in range(len(ids)):
+            c_ids.push_back((<uint32_t *> ids.data)[idx])
+        cdef string output
+        deref(self.spp).Decode(c_ids, &output)
+        return output.decode("utf-8")
+
+    def decode_from_pieces(self, list pieces):
+        cdef vector[string] c_strings
+        for piece in pieces:
+            if not isinstance(piece, str):
+                raise TypeError("Pieces must be of type `str` when decoding from pieces")
+            c_strings.push_back(piece.encode("utf-8"))
+        cdef string output
+        deref(self.spp).Decode(c_strings, &output)
+        return output.decode("utf-8")
+
     def encode(self, str sentence):
         cdef SentencePieceText text = self._encode(sentence)
 
