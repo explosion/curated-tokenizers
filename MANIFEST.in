@@ -1,0 +1,10 @@
+include LICENSE
+include README.md
+include pyproject.toml
+include setup.py
+include setup.cfg
+include tox.ini
+exclude MANIFEST.in
+recursive-include cysp config.h *.pyx *.pxd *.txt
+recursive-exclude cysp *.cpp
+recursive-include sentencepiece *.cc *.h *.inc
