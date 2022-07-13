@@ -4,7 +4,6 @@ import distutils.util
 from distutils.command.build_ext import build_ext
 from setuptools import Extension, setup, find_packages
 from pathlib import Path
-import numpy
 from Cython.Build import cythonize
 from Cython.Compiler import Options
 
@@ -174,7 +173,6 @@ def setup_package():
             + SENTENCEPIECE_SRC
             + SENTENCEPIECE_PROTOBUF_SRC,
             include_dirs=[
-                numpy.get_include(),
                 "cysp",
                 "sentencepiece",
                 "sentencepiece/src",
