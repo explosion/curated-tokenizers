@@ -1,4 +1,3 @@
-import numpy.testing
 from pathlib import Path
 import pytest
 
@@ -31,15 +30,13 @@ def test_load_unknown_file():
 
 def test_handles_nul_character(toy_model):
     ids, pieces = toy_model.encode("Test\0 nul")
-    numpy.testing.assert_equal(ids, [239, 382, 0, 7, 24, 231])
+    assert ids == [239, 382, 0, 7, 24, 231]
     assert pieces == ["▁T", "est", "\0", "▁", "n", "ul"]
 
 
 def test_decode_from_ids(toy_model):
     decoded = toy_model.decode_from_ids(
-        numpy.array(
-            [8, 465, 10, 947, 41, 10, 170, 168, 110, 28, 20, 143, 4], dtype="uint32"
-        )
+        [8, 465, 10, 947, 41, 10, 170, 168, 110, 28, 20, 143, 4]
     )
     assert decoded == "I saw a girl with a telescope."
 
@@ -74,9 +71,7 @@ def test_decode_with_pieces_rejects_inccorect_type(toy_model):
 
 def test_encode(toy_model):
     ids, pieces = toy_model.encode("I saw a girl with a telescope.")
-    numpy.testing.assert_equal(
-        ids, [8, 465, 10, 947, 41, 10, 170, 168, 110, 28, 20, 143, 4]
-    )
+    assert ids == [8, 465, 10, 947, 41, 10, 170, 168, 110, 28, 20, 143, 4]
     assert pieces == [
         "▁I",
         "▁saw",
@@ -128,11 +123,9 @@ def test_uninitialized_model():
     with pytest.raises(RuntimeError):
         spp.decode_from_pieces(["▁I"])
     with pytest.raises(RuntimeError):
-        spp.decode_from_ids(numpy.array([8], dtype="uint32"))
+        spp.decode_from_ids([8])
 
 
 def _check_ids(spp):
     ids = spp.encode_as_ids("I saw a girl with a telescope.")
-    numpy.testing.assert_equal(
-        ids, [8, 465, 10, 947, 41, 10, 170, 168, 110, 28, 20, 143, 4]
-    )
+    assert ids == [8, 465, 10, 947, 41, 10, 170, 168, 110, 28, 20, 143, 4]

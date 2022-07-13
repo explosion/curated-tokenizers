@@ -1,6 +1,4 @@
 from cython.operator cimport dereference as deref
-cimport numpy as np
-import numpy
 
 cdef class SentencePieceProcessor:
     def __cinit__(self):
@@ -26,11 +24,12 @@ cdef class SentencePieceProcessor:
         cdef string serialized = deref(self.spp).serialized_model_proto()
         return bytes(serialized)
 
-    def decode_from_ids(self, np.ndarray[uint32_t] ids):
+    def decode_from_ids(self, list ids):
         cdef vector[int] c_ids
-        cdef int idx
-        for idx in range(len(ids)):
-            c_ids.push_back((<uint32_t *> ids.data)[idx])
+        for piece_id in ids:
+            if not isinstance(piece_id, int):
+                raise TypeError("Pieces must be of type `int` when decoding from ids")
+            c_ids.push_back(piece_id)
         cdef string output
         _check_status(deref(self.spp).Decode(c_ids, &output))
         return output.decode("utf-8")
@@ -50,11 +49,11 @@ cdef class SentencePieceProcessor:
 
         cdef int idx
         cdef SentencePieceText_SentencePiece piece
-        cdef np.ndarray[uint32_t] ids = numpy.empty((text.pieces_size()), dtype="uint32")
         pieces = []
+        ids = []
         for idx in range(text.pieces_size()):
             piece = text.pieces(idx)
-            (<uint32_t *> ids.data)[idx] = piece.id()
+            ids.append(piece.id())
             pieces.append(piece.piece().decode("utf-8"))
 
         return ids, pieces
@@ -63,9 +62,9 @@ cdef class SentencePieceProcessor:
         cdef SentencePieceText text = self._encode(sentence)
 
         cdef int idx
-        cdef np.ndarray[uint32_t] ids = numpy.empty((text.pieces_size()), dtype="uint32")
+        ids = []
         for idx in range(text.pieces_size()):
-            (<uint32_t *> ids.data)[idx] = text.pieces(idx).id()
+            ids.append(text.pieces(idx).id())
 
         return ids
 
