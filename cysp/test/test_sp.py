@@ -2,7 +2,7 @@ import numpy.testing
 from pathlib import Path
 import pytest
 
-from cysp.sp import SentencePieceProcessor
+from cysp import SentencePieceProcessor
 
 
 @pytest.fixture(scope="module")
