@@ -2,7 +2,7 @@ import numpy.testing
 from pathlib import Path
 import pytest
 
-from cysp.sp import Processor
+from cysp.sp import SentencePieceProcessor
 
 
 @pytest.fixture(scope="module")
@@ -12,13 +12,13 @@ def test_dir(request):
 
 @pytest.fixture
 def toy_model(test_dir):
-    return Processor.from_file(str(test_dir / "toy.model"))
+    return SentencePieceProcessor.from_file(str(test_dir / "toy.model"))
 
 
 def test_load_proto(test_dir):
     with open(str(test_dir / "toy.model"), "rb") as f:
         data = f.read()
-    spp = Processor.from_protobuf(data)
+    spp = SentencePieceProcessor.from_protobuf(data)
     _check_ids(spp)
     serialized_data = spp.to_protobuf()
     assert serialized_data == data
@@ -26,7 +26,7 @@ def test_load_proto(test_dir):
 
 def test_load_unknown_file():
     with pytest.raises(OSError, match=r"No such file"):
-        Processor.from_file("bogus.model")
+        SentencePieceProcessor.from_file("bogus.model")
 
 
 def test_handles_nul_character(toy_model):
@@ -118,7 +118,7 @@ def test_encode_as_pieces(toy_model):
 
 
 def test_uninitialized_model():
-    spp = Processor()
+    spp = SentencePieceProcessor()
     with pytest.raises(RuntimeError):
         spp.encode("I saw a girl with a telescope.")
     with pytest.raises(RuntimeError):

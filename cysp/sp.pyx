@@ -2,22 +2,22 @@ from cython.operator cimport dereference as deref
 cimport numpy as np
 import numpy
 
-cdef class Processor:
+cdef class SentencePieceProcessor:
     def __cinit__(self):
-        self.spp.reset(new SentencePieceProcessor())
+        self.spp.reset(new CSentencePieceProcessor())
 
     def __init__(self):
         pass
 
     @staticmethod
     def from_file(str filename):
-        cdef Processor processor = Processor.__new__(Processor)
+        cdef SentencePieceProcessor processor = SentencePieceProcessor.__new__(SentencePieceProcessor)
         _check_status(deref(processor.spp).Load(filename.encode("utf-8")))
         return processor
 
     @staticmethod
     def from_protobuf(bytes protobuf):
-        cdef Processor processor = Processor.__new__(Processor)
+        cdef SentencePieceProcessor processor = SentencePieceProcessor.__new__(SentencePieceProcessor)
         cdef string_view protobuf_view = string_view(protobuf, len(protobuf))
         _check_status(deref(processor.spp).LoadFromSerializedProto(protobuf_view))
         return processor

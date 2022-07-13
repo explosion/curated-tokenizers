@@ -14,7 +14,7 @@ cdef extern from "builtin_pb/sentencepiece.pb.h" namespace "sentencepiece":
 
 
 cdef extern from "sentencepiece_processor.h" namespace "sentencepiece":
-    cdef cppclass SentencePieceProcessor:
+    cdef cppclass CSentencePieceProcessor "sentencepiece::SentencePieceProcessor":
         SentencePieceProcessor()
         string EncodeAsSerializedProto(const string& filename)
         Status Decode(const vector[int]& ids, string *detokenized)
@@ -45,7 +45,7 @@ cdef extern from "sentencepiece_processor.h" namespace "sentencepiece::util::Sta
     cdef StatusCode kInternal
     cdef StatusCode kNotFound
 
-cdef class Processor:
-    cdef shared_ptr[SentencePieceProcessor] spp
+cdef class SentencePieceProcessor:
+    cdef shared_ptr[CSentencePieceProcessor] spp
 
     cdef SentencePieceText _encode(self, str sentence) except *
