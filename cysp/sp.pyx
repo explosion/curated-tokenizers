@@ -80,6 +80,18 @@ cdef class SentencePieceProcessor:
 
         return pieces
 
+    def bos_id(self):
+        return deref(self.spp).bos_id()
+
+    def eos_id(self):
+        return deref(self.spp).eos_id()
+
+    def pad_id(self):
+        return deref(self.spp).pad_id()
+
+    def unk_id(self):
+        return deref(self.spp).unk_id()
+
     cdef SentencePieceText _encode(self, str sentence) except *:
         sentence_bytes = sentence.encode("utf-8")
         cdef SentencePieceText text;

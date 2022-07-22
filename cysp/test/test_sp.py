@@ -127,5 +127,9 @@ def test_uninitialized_model():
 
 
 def _check_ids(spp):
+    assert spp.bos_id() == 1
+    assert spp.eos_id() == 2
+    assert spp.unk_id() == 0
+    assert spp.pad_id() == -1  # Disabled in this model.
     ids = spp.encode_as_ids("I saw a girl with a telescope.")
     assert ids == [8, 465, 10, 947, 41, 10, 170, 168, 110, 28, 20, 143, 4]

@@ -22,6 +22,10 @@ cdef extern from "sentencepiece_processor.h" namespace "sentencepiece":
         Status Encode(const string& input, SentencePieceText * spt)
         Status Load(const string& filename)
         Status LoadFromSerializedProto(string_view serialized);
+        int bos_id() const
+        int eos_id() const
+        int pad_id() const
+        int unk_id() const
         string serialized_model_proto() const
 
 
