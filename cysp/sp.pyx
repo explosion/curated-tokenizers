@@ -81,15 +81,19 @@ cdef class SentencePieceProcessor:
         return pieces
 
     def bos_id(self):
+        _check_status(deref(self.spp).status())
         return deref(self.spp).bos_id()
 
     def eos_id(self):
+        _check_status(deref(self.spp).status())
         return deref(self.spp).eos_id()
 
     def pad_id(self):
+        _check_status(deref(self.spp).status())
         return deref(self.spp).pad_id()
 
     def unk_id(self):
+        _check_status(deref(self.spp).status())
         return deref(self.spp).unk_id()
 
     cdef SentencePieceText _encode(self, str sentence) except *:
