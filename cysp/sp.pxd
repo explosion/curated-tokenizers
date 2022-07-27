@@ -20,6 +20,7 @@ cdef extern from "sentencepiece_processor.h" namespace "sentencepiece":
         Status Decode(const vector[int]& ids, string *detokenized)
         Status Decode(const vector[string]& ids, string *detokenized)
         Status Encode(const string& input, SentencePieceText * spt)
+        int GetPieceSize() const
         Status Load(const string& filename)
         Status LoadFromSerializedProto(string_view serialized);
         Status status() const

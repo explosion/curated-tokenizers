@@ -135,6 +135,7 @@ def test_uninitialized_model():
 
 
 def _check_ids(spp):
+    assert len(spp) == 1000
     assert spp.bos_id() == 1
     assert spp.eos_id() == 2
     assert spp.unk_id() == 0
