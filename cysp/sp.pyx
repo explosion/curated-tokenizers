@@ -7,6 +7,10 @@ cdef class SentencePieceProcessor:
     def __init__(self):
         pass
 
+    def __len__(self):
+        _check_status(deref(self.spp).status())
+        return deref(self.spp).GetPieceSize()
+
     @staticmethod
     def from_file(str filename):
         cdef SentencePieceProcessor processor = SentencePieceProcessor.__new__(SentencePieceProcessor)
