@@ -124,6 +124,14 @@ def test_uninitialized_model():
         spp.decode_from_pieces(["▁I"])
     with pytest.raises(RuntimeError):
         spp.decode_from_ids([8])
+    with pytest.raises(RuntimeError):
+        spp.bos_id()
+    with pytest.raises(RuntimeError):
+        spp.eos_id()
+    with pytest.raises(RuntimeError):
+        spp.unk_id()
+    with pytest.raises(RuntimeError):
+        spp.pad_id()
 
 
 def _check_ids(spp):
