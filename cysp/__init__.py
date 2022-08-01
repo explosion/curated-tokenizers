@@ -1,1 +1,1 @@
-from .sp import SentencePieceProcessor
+from ._spp import SentencePieceProcessor

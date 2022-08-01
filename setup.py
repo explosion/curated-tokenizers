@@ -166,8 +166,8 @@ def setup_package():
 
     ext_modules = [
         Extension(
-            "cysp.sp",
-            ["cysp/sp.pyx"]
+            "cysp._spp",
+            ["cysp/_spp.pyx"]
             + ABSL_SRC
             + PROTOBUF_LIGHT_SRC
             + SENTENCEPIECE_SRC
