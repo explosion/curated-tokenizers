@@ -1,7 +1,7 @@
 from pathlib import Path
 import pytest
 
-from cysp import SentencePieceProcessor
+from cutlery import SentencePieceProcessor
 
 
 @pytest.fixture(scope="module")

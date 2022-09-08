@@ -76,7 +76,7 @@ SENTENCEPIECE_SRC = prefix_path(
 
 PACKAGES = find_packages()
 MOD_NAMES = [
-    "cysp.sp",
+    "cutlery.sp",
 ]
 COMPILE_OPTIONS = {
     "msvc": [
@@ -162,18 +162,18 @@ def setup_package():
     root = Path(__file__).parent
 
     if len(sys.argv) > 1 and sys.argv[1] == "clean":
-        return clean(root / "cysp")
+        return clean(root / "cutlery")
 
     ext_modules = [
         Extension(
-            "cysp._spp",
-            ["cysp/_spp.pyx"]
+            "cutlery._spp",
+            ["cutlery/_spp.pyx"]
             + ABSL_SRC
             + PROTOBUF_LIGHT_SRC
             + SENTENCEPIECE_SRC
             + SENTENCEPIECE_PROTOBUF_SRC,
             include_dirs=[
-                "cysp",
+                "cutlery",
                 "sentencepiece",
                 "sentencepiece/src",
                 "sentencepiece/src/builtin_pb",
@@ -187,7 +187,7 @@ def setup_package():
         ext_modules, compiler_directives=COMPILER_DIRECTIVES, language_level=2
     )
     setup(
-        name="cysp",
+        name="cutlery",
         packages=PACKAGES,
         ext_modules=ext_modules,
         cmdclass={"build_ext": build_ext_subclass},
