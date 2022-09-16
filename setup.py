@@ -180,7 +180,12 @@ def setup_package():
                 "sentencepiece/third_party/protobuf-lite",
             ],
             language="c++",
-        )
+        ),
+        Extension(
+            "cutlery._wordpiece",
+            ["cutlery/_wordpiece.pyx"],
+            language="c++",
+        ),
     ]
     print("Cythonizing sources")
     ext_modules = cythonize(
