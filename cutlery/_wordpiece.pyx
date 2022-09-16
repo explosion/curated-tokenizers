@@ -51,7 +51,7 @@ cdef class WordPieceProcessor:
 
 
     @staticmethod
-    def from_file(str filename):
+    def from_file(filename: str) -> WordPieceProcessor:
         with open(filename, encoding="utf8") as f:
             pieces = [line.strip() for line in f]
         return WordPieceProcessor(pieces)
@@ -68,7 +68,7 @@ cdef class WordPieceProcessor:
         return pieces
 
 
-cdef PieceMatch _find_longest_prefix(const unordered_map[string, size_t]* pieces, token: str):
+cdef PieceMatch _find_longest_prefix(const unordered_map[string, size_t]* pieces, str token):
     cdef PieceMatch match
     cdef unordered_map[string, size_t].const_iterator idx
     match.found = False
