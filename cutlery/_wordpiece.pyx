@@ -45,7 +45,7 @@ cdef class WordPieceProcessor:
         cdef unordered_map[string, size_t].const_iterator iter
         iter = self.initial_pieces.const_find(piece.encode('utf8'))
         if iter == self.initial_pieces.end():
-            raise KeyError()
+            raise KeyError(f"unknown initial piece {piece}")
         else:
             return deref(iter).second
 
