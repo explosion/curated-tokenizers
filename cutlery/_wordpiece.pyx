@@ -52,7 +52,7 @@ cdef class WordPieceProcessor:
 
     @staticmethod
     def from_file(str filename):
-        with open(filename) as f:
+        with open(filename, encoding="utf8") as f:
             pieces = [line.strip() for line in f]
         return WordPieceProcessor(pieces)
 
