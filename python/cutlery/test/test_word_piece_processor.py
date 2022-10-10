@@ -18,6 +18,11 @@ def toy_processor():
     return WordPieceProcessor(["voor", "##tie", "coördina", "##kom", "##en"])
 
 
+def test_can_get_initial(toy_processor):
+    assert toy_processor.get_initial("voor") == 0
+    assert toy_processor.get_initial("onbek") == None
+
+
 def test_word_piece_processor_small(toy_processor):
     assert toy_processor.encode("voor") == ([0], ["voor"])
     assert toy_processor.encode("voorman") == ([0, -1], ["voor", None])

@@ -24,7 +24,7 @@ def test_load_proto(test_dir):
 
 
 def test_load_unknown_file():
-    with pytest.raises(OSError, match=r"No such file"):
+    with pytest.raises(OSError, match=r"Not found"):
         SentencePieceProcessor.from_file("bogus.model")
 
 
@@ -62,8 +62,8 @@ def test_decode_from_pieces(toy_model):
     assert decoded == "I saw a girl with a telescope."
 
 
-def test_decode_with_pieces_rejects_inccorect_type(toy_model):
-    with pytest.raises(TypeError):
+def test_decode_with_pieces_rejects_incorect_type(toy_model):
+    with pytest.raises(ValueError):
         toy_model.decode_from_pieces("test")
     with pytest.raises(TypeError):
         toy_model.decode_from_pieces([1, 2, 3])
@@ -114,23 +114,23 @@ def test_encode_as_pieces(toy_model):
 
 def test_uninitialized_model():
     spp = SentencePieceProcessor()
-    with pytest.raises(RuntimeError):
+    with pytest.raises(ValueError):
         spp.encode("I saw a girl with a telescope.")
-    with pytest.raises(RuntimeError):
+    with pytest.raises(ValueError):
         spp.encode_as_ids("I saw a girl with a telescope.")
-    with pytest.raises(RuntimeError):
+    with pytest.raises(ValueError):
         spp.encode_as_pieces("I saw a girl with a telescope.")
-    with pytest.raises(RuntimeError):
+    with pytest.raises(ValueError):
         spp.decode_from_pieces(["▁I"])
-    with pytest.raises(RuntimeError):
+    with pytest.raises(ValueError):
         spp.decode_from_ids([8])
-    with pytest.raises(RuntimeError):
+    with pytest.raises(ValueError):
         spp.bos_id()
-    with pytest.raises(RuntimeError):
+    with pytest.raises(ValueError):
         spp.eos_id()
-    with pytest.raises(RuntimeError):
+    with pytest.raises(ValueError):
         spp.unk_id()
-    with pytest.raises(RuntimeError):
+    with pytest.raises(ValueError):
         spp.pad_id()
 
 
@@ -139,6 +139,6 @@ def _check_ids(spp):
     assert spp.bos_id() == 1
     assert spp.eos_id() == 2
     assert spp.unk_id() == 0
-    assert spp.pad_id() == -1  # Disabled in this model.
+    assert spp.pad_id() == None  # Disabled in this model.
     ids = spp.encode_as_ids("I saw a girl with a telescope.")
     assert ids == [8, 465, 10, 947, 41, 10, 170, 168, 110, 28, 20, 143, 4]

@@ -1,0 +1,17 @@
+[package]
+name = "cutlery"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "cutlery"
+crate-type = ["cdylib"]
+
+[dependencies]
+fst = "0.4"
+pyo3 = { version = "0.17", features = ["extension-module", "abi3", "abi3-py37"] }
+sentencepiece = "0.10"
+wordpieces = "0.6"
+
+[package.metadata.maturin]
+python-source = "python"

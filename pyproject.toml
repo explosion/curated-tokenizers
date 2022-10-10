@@ -1,6 +1,7 @@
 [build-system]
-requires = [
-    "setuptools",
-    "cython>=0.25",
-]
-build-backend = "setuptools.build_meta"
+requires = ["maturin>=0.13,<0.14"]
+build-backend = "maturin"
+
+[project]
+name = "rust-ops"
+requires-python = ">=3.7"
