@@ -1,5 +1,5 @@
 # Build dependencies
-cython>=0.25
+setuptools-rust
 wheel
 
 # dev
