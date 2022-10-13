@@ -186,6 +186,12 @@ def setup_package():
             ["cutlery/_wordpiece.pyx"],
             language="c++",
         ),
+        Extension(
+            "cutlery._bbpe",
+            ["cutlery/_bbpe.pyx", "cutlery/merges.cc"],
+            include_dirs=["cutlery"],
+            language="c++",
+        ),
     ]
     print("Cythonizing sources")
     ext_modules = cythonize(
