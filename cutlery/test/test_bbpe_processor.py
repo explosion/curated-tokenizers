@@ -70,3 +70,11 @@ def test_can_encode_as_ids(toy_processor):
 
 def test_can_encode_as_pieces(toy_processor):
     assert toy_processor.encode_as_pieces(EXAMPLE_TEXT) == EXAMPLE_PIECES
+
+
+def test_rejects_incorrect_merges(test_dir):
+    with pytest.raises(ValueError, match=r"Merge must consist of 2 items"):
+        ByteBPEProcessor.load_from_files(
+            vocab=test_dir / "robbert-vocab-1000.json",
+            merges=test_dir / "incorrect-merges.txt",
+        )

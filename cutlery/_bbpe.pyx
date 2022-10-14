@@ -72,7 +72,12 @@ cdef class ByteBPEProcessor:
             version = f.readline()
             if not version.startswith("#version: 0.2"):
                 raise ValueError(f"Only version 0.2 of the merges format is supported, was: {version.strip()}")
-            merges = [tuple(line.strip().split(" ")) for line in f]
+            merges = []
+            for line in f:
+                merge = line.strip().split(" ")
+                if len(merge) != 2:
+                    raise ValueError(f"Merge must consist of 2 items, was {len(merge)}: {line.strip()}")
+                merges.append(merge)
         return ByteBPEProcessor(vocab, merges)
 
 
