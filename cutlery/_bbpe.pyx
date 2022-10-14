@@ -98,10 +98,10 @@ cdef class ByteBPEProcessor:
 
     def encode_as_pieces(self, text: str) -> List[str]:
         """
-        Split a text into pieces, returning piece identifiers.
+        Split a text into pieces, returning piece pieces.
 
             text: The text to split.
-            RETURNS: Piece identifiers.
+            RETURNS: Piece pieces.
         """
         pieces = []
         for token in regex.findall(self._split_pattern, text):
