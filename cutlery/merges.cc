@@ -6,8 +6,7 @@
 #include "merges.hh"
 
 Merges::Merges(std::vector<string_pair> const &merges) {
-    for (size_t i = 0; i < merges.size(); i++)
-    {
+    for (size_t i = 0; i < merges.size(); i++) {
         _merges[merges[i]] = i;
     }
 }
@@ -31,11 +30,11 @@ std::vector<std::string> Merges::apply_merges(std::vector<std::string> pieces) c
         for (size_t i = 0; i < pieces.size();) {
             if (i < pieces.size() - 1 && pieces[i] == best_pair.first && pieces[i+1] == best_pair.second) {
                 // Merge
-                new_pieces.push_back(pieces[i] + pieces[i + 1]);
+                new_pieces.emplace_back(pieces[i] + pieces[i + 1]);
                 i += 2;
             } else {
                 // Copy
-                new_pieces.push_back(pieces[i]);
+                new_pieces.emplace_back(pieces[i]);
                 ++i;
             }
 
