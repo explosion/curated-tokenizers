@@ -46,7 +46,7 @@ std::vector<std::string> Merges::apply_merges(std::vector<std::string> pieces) c
     return pieces;
 }
 
-string_pair Merges::find_best_pair(std::vector<std::string> pieces) const {
+string_pair Merges::find_best_pair(std::vector<std::string> const &pieces) const {
     string_pair best_pair;
     size_t best_rank = _merges.size();
     for (size_t i = 0; i < pieces.size() - 1; ++i) {

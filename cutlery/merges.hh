@@ -45,6 +45,6 @@ public:
      */
     std::vector<std::pair<std::string, std::string>> merges() const;
 private:
-    string_pair find_best_pair(std::vector<std::string> pieces) const;
+    string_pair find_best_pair(std::vector<std::string> const &pieces) const;
     std::unordered_map<string_pair, size_t, PairHash> _merges;
 };
