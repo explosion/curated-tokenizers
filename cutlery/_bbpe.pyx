@@ -76,7 +76,7 @@ cdef class ByteBPEProcessor:
         return ByteBPEProcessor(vocab, merges)
 
 
-    def encode(self, text: str) -> Tuple[List[str], List[int]]:
+    def encode(self, text: str) -> Tuple[List[int], List[str]]:
         """
         Split a text into pieces.
 
