@@ -67,8 +67,8 @@ string_pair Merges::find_best_pair(std::vector<std::string> const &pieces) const
 
 std::vector<std::pair<std::string, std::string>> Merges::merges() const {
     std::vector<std::pair<std::string, std::string>> merges(_merges.size());
-    for (auto iter = _merges.begin(); iter != _merges.end(); ++iter) {
-        merges[iter->second] = iter->first;
+    for (auto const &merge: _merges) {
+        merges[merge.second] = merge.first;
     }
 
     return merges;
