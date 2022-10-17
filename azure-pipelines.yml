@@ -73,5 +73,5 @@ jobs:
     displayName: 'Install test dependencies'
 
   - script: |
-      python -m pytest --pyargs cutlery --cov=cutlery --cov-report=term
+      python -m pytest --pyargs cutlery
     displayName: 'Run tests'
