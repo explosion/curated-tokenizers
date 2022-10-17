@@ -5,6 +5,6 @@ include setup.py
 include setup.cfg
 include tox.ini
 exclude MANIFEST.in
-recursive-include cutlery config.h merges.cc merges.hh *.pyx *.pxd *.txt
+recursive-include cutlery config.h merges.cc merges.hh *.pyx *.pxd *.txt *.model *.json
 recursive-exclude cutlery *.cpp
 recursive-include sentencepiece *.cc *.h *.inc

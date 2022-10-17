@@ -1,19 +1,77 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- main
+  batch: true
+  branches:
+    include:
+    - '*'
 
-pool:
-  vmImage: ubuntu-latest
+jobs:
+- job: 'Test'
+  strategy:
+    matrix:
+      Python36Windows:
+        imageName: 'windows-2019'
+        python.version: '3.6'
+      Python37Mac:
+        imageName: 'macos-latest'
+        python.version: '3.7'
+      Python38Linux:
+        imageName: 'ubuntu-latest'
+        python.version: '3.8'
+      Python39Windows:
+        imageName: 'windows-latest'
+        python.version: '3.9'
+      Python310Linux:
+        imageName: 'ubuntu-latest'
+        python.version: '3.10'
+      Python310Windows:
+        imageName: 'windows-latest'
+        python.version: '3.10'
+      Python310Mac:
+        imageName: 'macos-latest'
+        python.version: '3.10'
+    maxParallel: 4
+  pool:
+    vmImage: $(imageName)
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+  steps:
+  - checkout: self
+    submodules: true
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
+
+  - script: |
+      python -m pip install --upgrade pip setuptools wheel
+      pip install -r requirements.txt
+    displayName: 'Install dependencies'
+
+  - script: |
+      python setup.py build_ext --inplace
+      python setup.py sdist --formats=gztar
+    displayName: 'Build sdist'
+
+  - task: DeleteFiles@1
+    inputs:
+      contents: 'cutlery'
+    displayName: 'Delete source directory'
+
+  - script: |
+      python -m pip freeze
+      pip freeze --exclude pywin32 > installed.txt
+      pip uninstall -y -r installed.txt
+    displayName: 'Uninstall all packages'
+
+  - bash: |
+      SDIST=$(python -c "import os;print(os.listdir('./dist')[-1])" 2>&1)
+      pip install dist/$SDIST
+    displayName: 'Install from sdist'
+
+  - script: |
+      pip install -r requirements.txt
+    displayName: 'Install test dependencies'
+
+  - script: |
+      python -m pytest --pyargs cutlery
+    displayName: 'Run tests'
