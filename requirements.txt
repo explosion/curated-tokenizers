@@ -3,7 +3,7 @@ cython>=0.25
 wheel
 
 # Runtime dependencies
-regex
+regex >= 2022
 
 # dev
 pytest>=5.2.0
