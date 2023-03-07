@@ -2,7 +2,6 @@ name: Test
 
 on: [push, pull_request, workflow_call]
 
-
 jobs:
   test:
     name: Run tests
@@ -23,7 +22,7 @@ jobs:
 
       - name: Install requirements
         run: |
-          pip install --upgrade pip setuptools wheel
+          pip install --upgrade pip setuptools wheel build
           pip install -r requirements.txt
 
       - name: Build sdist
