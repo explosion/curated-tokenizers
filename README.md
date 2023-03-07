@@ -26,6 +26,6 @@ pip install cutlery
 ## 🚀 Quickstart
 
 The best way to get started with cutlery is through the
-[`curated-transformers`](https://github.com/danieldk/curated-transformers)
+[`curated-transformers`](https://github.com/explosion/curated-transformers)
 library. `curated-transformers` also provides functionality to load tokenization
 models from Huggingface Hub.
