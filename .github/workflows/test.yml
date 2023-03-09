@@ -1,0 +1,56 @@
+name: Test
+
+on: [push, pull_request, workflow_call]
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.7", "3.10"]
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          submodules: true
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip" # caching pip dependencies
+
+      - name: Install requirements
+        run: |
+          pip install --upgrade pip setuptools wheel build
+          pip install -r requirements.txt
+
+      - name: Build sdist
+        run: |
+          python -m build --sdist
+
+      # - name: Run mypy
+      #   run: mypy cutlery
+
+      - name: Delete source directory
+        run: |
+          rm -rf cutlery
+        shell: bash
+
+      - name: Uninstall all packages
+        run: |
+          pip freeze
+          pip freeze --exclude pywin32 > installed.txt
+          pip uninstall -y -r installed.txt
+
+      - name: Install from sdist
+        run: |
+          SDIST=$(python -c "import os;print(os.listdir('./dist')[-1])" 2>&1)
+          pip install dist/$SDIST
+        shell: bash
+
+      - name: Install test dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pytest
+        run: python -m pytest --pyargs cutlery
