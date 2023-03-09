@@ -29,8 +29,8 @@ jobs:
         run: |
           python -m build --sdist
 
-      # - name: Run mypy
-      #   run: mypy cutlery
+      - name: Run mypy
+        run: mypy cutlery
 
       - name: Delete source directory
         run: |
