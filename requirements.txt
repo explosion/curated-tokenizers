@@ -7,3 +7,4 @@ regex >= 2022
 
 # dev
 pytest>=5.2.0
+mypy>=0.990,<0.1000; platform_machine != "aarch64" and python_version >= "3.7"
