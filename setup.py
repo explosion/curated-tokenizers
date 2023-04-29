@@ -80,6 +80,7 @@ MOD_NAMES = [
 ]
 COMPILE_OPTIONS = {
     "msvc": [
+        "/std:c++17",
         "/Ox",
         "/EHsc",
         "/DHAVE_PTHREAD",
