@@ -1,8 +1,9 @@
 # cython: infer_types
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 from cython.operator cimport dereference as deref
 from functools import lru_cache
+from io import BytesIO
 import json
 from libcpp.memory cimport make_shared, shared_ptr
 from pathlib import Path
@@ -51,13 +52,15 @@ cdef class ByteBPEProcessor:
     cdef dict _byte_decoder
     cdef dict _byte_encoder
     cdef object _split_pattern
-    cdef dict _vocab
+    cdef dict _piece_to_id
+    cdef dict _id_to_piece
 
     def __init__(self, vocab: Dict[str, int], merges: List[Tuple[str, str]]):
         self._byte_encoder = bytes_to_unicode()
-        self._byte_decoder = {v: k for k, v in self._byte_encoder.items()}
+        self._byte_decoder = {v.decode("utf-8"): k for k, v in self._byte_encoder.items()}
         self._split_pattern = regex.compile(SPLIT_PATTERN)
-        self._vocab = vocab
+        self._piece_to_id = vocab
+        self._id_to_piece = {v: k for k, v in vocab.items()}
         cdef vector[pair[string, string]] c_merges
         for p1, p2 in merges:
             c_merges.push_back(pair[string, string](p1.encode('utf-8'), p2.encode('utf-8')))
@@ -80,6 +83,21 @@ cdef class ByteBPEProcessor:
                 merges.append(merge)
         return ByteBPEProcessor(vocab, merges)
 
+    def decode_from_ids(self, ids: Iterable[int]) -> str:
+        """
+        Decode piece identifiers into string.
+
+            ids (Iterable[int]): piece identifiers.
+            RETURNS (str): decoded string.
+        """
+        decoded = BytesIO()
+        for piece_id in ids:
+            piece = self._id_to_piece.get(piece_id, None)
+            if piece is None:
+                raise ValueError(f"Unknown piece identifier: {piece_id}")
+            decoded.write(bytes([self._byte_decoder[cp] for cp in list(piece)]))
+
+        return decoded.getvalue().decode("utf-8")
 
     def encode(self, text: str) -> Tuple[List[int], List[str]]:
         """
@@ -123,20 +141,19 @@ cdef class ByteBPEProcessor:
 
     def piece_id(self, piece: str) -> Optional[int]:
         """Get the identifier for a piece."""
-        return self._vocab.get(piece)
+        return self._piece_to_id.get(piece)
 
     @property
     def vocab(self) -> Dict[str, int]:
         """Get a copy of the vocabulary."""
-        return dict(self._vocab)
+        return dict(self._piece_to_id)
 
     def _pieces_to_ids(self, pieces):
         piece_ids = []
         for piece in pieces:
-            piece_id = self._vocab.get(piece)
+            piece_id = self._piece_to_id.get(piece)
             if piece_id is None:
                 raise ValueError(f"Piece is not in vocabulary: {piece}")
             piece_ids.append(piece_id)
 
         return piece_ids
-        
