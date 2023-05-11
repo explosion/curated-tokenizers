@@ -59,6 +59,9 @@ def test_empty_processor():
         "n",
     ]
 
+def test_can_decode(toy_processor):
+    assert toy_processor.decode_from_ids(EXAMPLE_PIECE_IDS) == EXAMPLE_TEXT
+
 
 def test_can_encode(toy_processor):
     assert toy_processor.encode(EXAMPLE_TEXT) == (EXAMPLE_PIECE_IDS, EXAMPLE_PIECES)
