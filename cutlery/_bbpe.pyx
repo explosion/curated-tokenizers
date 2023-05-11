@@ -22,7 +22,7 @@ SPLIT_PATTERN = r"""'s|'t|'re|'ve|'m|'ll|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+
 
 
 @lru_cache()
-def bytes_to_unicode() -> Dict[int, str]:
+def bytes_to_unicode() -> Dict[int, bytes]:
     """
     Returns list of utf-8 byte and a corresponding list of unicode strings.
     The reversible bpe codes work on unicode strings.
