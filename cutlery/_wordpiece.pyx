@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Iterable
 from cython.operator cimport dereference as deref
 from libcpp cimport pair
 
@@ -9,11 +9,15 @@ cdef struct PieceMatch:
 
 cdef class WordPieceProcessor:
     def __init__(self, pieces: List[str]):
+        self._id_to_piece = []
         for idx, piece in enumerate(pieces):
             if piece.startswith("##"):
                 self.continuation_pieces[piece[2:].encode('utf8')] = idx
+                self._id_to_piece.append(piece[2:])
             else:
                 self.initial_pieces[piece.encode('utf8')] = idx
+                self._id_to_piece.append(piece)
+            assert idx == len(self._id_to_piece) - 1
 
     def encode(self, token: str) -> Tuple[List[int], List[str]]:
         """
@@ -21,7 +25,8 @@ cdef class WordPieceProcessor:
         returned. If no piece could be found for a suffix, the special
         piece identifier `-1` is used.
 
-            token: The token to encode as pieces.
+            token (str): The token to encode as pieces.
+            RETURNS (Tuple[List[int], List[str]]): Piece identifiers and token pieces.
         """
         token_ids = []
         token_pieces = []
@@ -40,6 +45,23 @@ cdef class WordPieceProcessor:
             pieces = &self.continuation_pieces
             prefix = "##"
         return token_ids, token_pieces
+
+    def decode(self, pieces: Iterable[int], *, unk_token: str = "<unk>") -> str:
+        """
+        Decode piece identifiers into string. Invalid piece identifiers
+        are replaced with the `unk_token` string.
+
+            ids (Iterable[int]): Piece identifiers.
+            RETURNS (str): Decoded string.
+        """
+        token_pieces = []
+        for piece_id in pieces:
+            if 0 <= piece_id < len(self._id_to_piece):
+                token_pieces.append(self._id_to_piece[piece_id])
+            else:
+                token_pieces.append(unk_token)
+
+        return "".join(token_pieces)
 
     def get_initial(self, piece: str) -> int:
         cdef unordered_map[string, size_t].const_iterator iter
