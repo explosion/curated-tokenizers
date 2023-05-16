@@ -39,7 +39,7 @@ def toy_processor_from_file(test_dir):
 
 @pytest.fixture
 def toy_processor():
-    return WordPieceProcessor(["voor", "##tie", "coördina", "##kom", "##en"])
+    return WordPieceProcessor(TOKEN_PIECES)
 
 
 def test_word_piece_processor_small_encode(toy_processor):
