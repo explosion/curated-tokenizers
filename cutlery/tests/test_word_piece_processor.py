@@ -78,3 +78,10 @@ def test_is_initial_or_continuation_piece_id(toy_processor):
     assert [
         toy_processor.is_continuation_piece_id(id) for id in range(len(TOKEN_PIECES))
     ] == [False, True, False, True, True]
+
+
+def test_piece_id_valid(toy_processor):
+    assert toy_processor.is_valid_piece_id(-1) == False
+    assert toy_processor.is_valid_piece_id(0) == True
+    assert toy_processor.is_valid_piece_id(len(TOKEN_PIECES)) == False
+    assert toy_processor.is_valid_piece_id(len(TOKEN_PIECES) - 1) == True

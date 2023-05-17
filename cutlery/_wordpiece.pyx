@@ -139,6 +139,16 @@ cdef class WordPieceProcessor:
         else:
             return unk_token
 
+    def is_valid_piece_id(self, piece: int) -> bool:
+        """
+        Returns True if the piece identifier is valid, False otherwise.
+
+            piece (int): Piece ID.
+            RETURNS (bool): Is valid.
+        """
+        num_total_ids = self.initial_piece_to_id.size() + self.continuation_piece_to_id.size()
+        return 0 <= piece <= num_total_ids - 1
+
     @staticmethod
     def from_file(filename: str) -> WordPieceProcessor:
         with open(filename, encoding="utf8") as f:
