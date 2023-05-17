@@ -13,11 +13,11 @@ cdef class WordPieceProcessor:
             if piece.startswith("##"):
                 byte_array = piece[2:].encode('utf8')
                 self.continuation_piece_to_id[byte_array] = idx
-                self.id_to_continuation_piece[idx] = byte_array
+                self.id_to_piece.push_back(Piece(byte_array, False))
             else:
                 byte_array = piece.encode('utf8')
-                self.initial_piece_to_id[piece.encode('utf8')] = idx
-                self.id_to_initial_piece[idx] = byte_array
+                self.initial_piece_to_id[byte_array] = idx
+                self.id_to_piece.push_back(Piece(byte_array, True))
 
     def encode(self, token: str) -> Tuple[List[int], List[str]]:
         """
@@ -46,16 +46,15 @@ cdef class WordPieceProcessor:
             prefix = "##"
         return token_ids, token_pieces
 
-    def decode(self, pieces: Iterable[int], *, unk_token: str = "<unk>") -> str:
+    def decode(self, pieces: Iterable[int]) -> str:
         """
-        Decode piece identifiers into string. Invalid piece identifiers
-        are replaced with the `unk_token` string.
+        Decode token piece identifiers into string. Raises a `ValueError` 
+        if any of the identifiers are invalid.
 
             ids (Iterable[int]): Piece IDs.
-            unk_token (str): Marker for unknown piece IDs.
             RETURNS (str): Decoded string.
         """
-        token_pieces = [self.piece_id_to_str(id, unk_token=unk_token) for id in pieces]
+        token_pieces = [self.lookup_piece_id(id)[0] for id in pieces]
         return "".join(token_pieces)
 
     def get_initial(self, piece: str) -> int:
@@ -73,71 +72,22 @@ cdef class WordPieceProcessor:
         else:
             return deref(iter).second
 
-    def get_continuation(self, piece: str) -> int:
+    def lookup_piece_id(self, piece: int) -> Tuple[str, bool]:
         """
-        Returns the ID for the given continuation piece. Raises a `KeyError` if 
-        the string isn't an continuation piece.
-
-            piece (str): Continuation piece string.
-            RETURNS (int): Piece ID.
-        """
-        if piece[:2] != "##":
-            raise KeyError(f"missing prefix in continuation piece `{piece}`")
-        else:
-            piece = piece[2:]
-        cdef unordered_map[string, size_t].const_iterator iter
-        iter = self.continuation_piece_to_id.const_find(piece.encode('utf8'))
-        if iter == self.continuation_piece_to_id.end():
-            raise KeyError(f"unknown continuation piece `{piece}`")
-        else:
-            return deref(iter).second
-
-    def is_initial_piece_id(self, piece: int) -> bool:
-        """
-        Returns True if the piece identifier corresponds to an inital piece, False
-        otherwise.
+        Returns the piece string (without any prefix) for a given piece identifier 
+        and a boolean identifying if it is an initial piece. Raises a `ValueError` if 
+        any of the identifiers are invalid.
 
             piece (int): Piece ID.
-            RETURNS (bool): Is initial.
+            RETURNS (Tuple[str, bool]): Piece string and a boolean identifying if
+                it is an initial piece.
         """
-        cdef unordered_map[size_t, string].const_iterator iter
-        iter = self.id_to_initial_piece.const_find(piece)
-        return iter != self.id_to_initial_piece.end()
-
-    def is_continuation_piece_id(self, piece: int) -> bool:
-        """
-        Returns True if the piece identifier corresponds to a continuation piece, False
-        otherwise.
-
-            piece (int): Piece ID.
-            RETURNS (bool): Is continuation.
-        """
-        cdef unordered_map[size_t, string].const_iterator iter
-        iter = self.id_to_continuation_piece.const_find(piece)
-        return iter != self.id_to_continuation_piece.end()
-
-    def piece_id_to_str(self, piece: int, *, unk_token: str = "<unk>") -> str:
-        """
-        Returns the piece string (without any prefix) for a given piece identifier. 
-        Invalid piece identifiers return the `unk_token` string.
-
-            piece (int): Piece ID.
-            unk_token (str): Marker for unknown piece IDs.
-            RETURNS (str): Piece string.
-        """
-        if piece < 0:
-            return unk_token
-
-        cdef unordered_map[size_t, string].const_iterator iter
-        iter = self.id_to_initial_piece.const_find(piece)
-        if iter != self.id_to_initial_piece.end():
-            return deref(iter).second.decode('utf8')
-
-        iter = self.id_to_continuation_piece.const_find(piece)
-        if iter != self.id_to_continuation_piece.end():
-            return deref(iter).second.decode('utf8')
+        cdef Piece* ptr_piece
+        if self.is_valid_piece_id(piece):
+            ptr_piece = &self.id_to_piece[piece]
+            return (ptr_piece[0].piece.decode('utf8'), ptr_piece[0].is_initial) 
         else:
-            return unk_token
+            raise ValueError(f"invalid piece identifier `{piece}`")
 
     def is_valid_piece_id(self, piece: int) -> bool:
         """
@@ -146,8 +96,7 @@ cdef class WordPieceProcessor:
             piece (int): Piece ID.
             RETURNS (bool): Is valid.
         """
-        num_total_ids = self.initial_piece_to_id.size() + self.continuation_piece_to_id.size()
-        return 0 <= piece <= num_total_ids - 1
+        return 0 <= piece <= self.id_to_piece.size() - 1
 
     @staticmethod
     def from_file(filename: str) -> WordPieceProcessor:

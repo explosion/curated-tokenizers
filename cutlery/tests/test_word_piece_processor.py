@@ -19,7 +19,7 @@ EXAMPLE_ENCODINGS = [
 
 EXAMPLE_DECODINGS = [
     "voor",
-    "voor<unk>",
+    "",  # Will raise an error.
     "coördinatie",
     "voorkomen",
 ]
@@ -49,7 +49,11 @@ def test_word_piece_processor_small_encode(toy_processor):
 
 def test_word_piece_processor_small_decode(toy_processor):
     for encoding, result in zip(EXAMPLE_ENCODINGS, EXAMPLE_DECODINGS):
-        assert toy_processor.decode(encoding[0], unk_token="<unk>") == result
+        if -1 in encoding[0]:
+            with pytest.raises(ValueError):
+                toy_processor.decode(encoding[0])
+        else:
+            assert toy_processor.decode(encoding[0]) == result
 
 
 def test_to_list(toy_processor):
@@ -60,24 +64,10 @@ def test_from_file(toy_processor_from_file):
     assert toy_processor_from_file.to_list() == TOKEN_PIECES
 
 
-def test_initial_and_continuation(toy_processor):
+def test_get_initial(toy_processor):
     assert toy_processor.get_initial("voor") == 0
     with pytest.raises(KeyError):
         toy_processor.get_initial("##tie")
-
-    assert toy_processor.get_continuation("##tie") == 1
-    with pytest.raises(KeyError):
-        toy_processor.get_continuation("coördina")
-
-
-def test_is_initial_or_continuation_piece_id(toy_processor):
-    assert [
-        toy_processor.is_initial_piece_id(id) for id in range(len(TOKEN_PIECES))
-    ] == [True, False, True, False, False]
-
-    assert [
-        toy_processor.is_continuation_piece_id(id) for id in range(len(TOKEN_PIECES))
-    ] == [False, True, False, True, True]
 
 
 def test_piece_id_valid(toy_processor):
