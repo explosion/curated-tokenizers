@@ -4,7 +4,7 @@ from libcpp.unordered_map cimport unordered_map
 from libcpp.vector cimport vector
 
 cdef class WordPieceProcessor:
-    cdef unordered_map[string, size_t] initial_pieces
-    cdef unordered_map[string, size_t] continuation_pieces
-    cdef list _id_to_piece
-    cdef set _initial_piece_ids
+    cdef unordered_map[string, size_t] initial_piece_to_id
+    cdef unordered_map[size_t, string] id_to_initial_piece
+    cdef unordered_map[string, size_t] continuation_piece_to_id
+    cdef unordered_map[size_t, string] id_to_continuation_piece

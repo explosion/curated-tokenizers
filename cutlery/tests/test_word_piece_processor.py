@@ -60,7 +60,21 @@ def test_from_file(toy_processor_from_file):
     assert toy_processor_from_file.to_list() == TOKEN_PIECES
 
 
-def test_is_initial_piece_id(toy_processor):
+def test_initial_and_continuation(toy_processor):
+    assert toy_processor.get_initial("voor") == 0
+    with pytest.raises(KeyError):
+        toy_processor.get_initial("##tie")
+
+    assert toy_processor.get_continuation("##tie") == 1
+    with pytest.raises(KeyError):
+        toy_processor.get_continuation("coördina")
+
+
+def test_is_initial_or_continuation_piece_id(toy_processor):
     assert [
         toy_processor.is_initial_piece_id(id) for id in range(len(TOKEN_PIECES))
     ] == [True, False, True, False, False]
+
+    assert [
+        toy_processor.is_continuation_piece_id(id) for id in range(len(TOKEN_PIECES))
+    ] == [False, True, False, True, True]
