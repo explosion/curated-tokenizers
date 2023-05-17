@@ -10,6 +10,7 @@ cdef struct PieceMatch:
 cdef class WordPieceProcessor:
     def __init__(self, pieces: List[str]):
         self._id_to_piece = []
+        self._initial_piece_ids = set()
         for idx, piece in enumerate(pieces):
             if piece.startswith("##"):
                 self.continuation_pieces[piece[2:].encode('utf8')] = idx
@@ -17,6 +18,8 @@ cdef class WordPieceProcessor:
             else:
                 self.initial_pieces[piece.encode('utf8')] = idx
                 self._id_to_piece.append(piece)
+                self._initial_piece_ids.add(idx)
+
             assert idx == len(self._id_to_piece) - 1
 
     def encode(self, token: str) -> Tuple[List[int], List[str]]:
@@ -71,6 +74,8 @@ cdef class WordPieceProcessor:
         else:
             return deref(iter).second
 
+    def is_initial_piece_id(self, piece: int) -> bool:
+        return piece in self._initial_piece_ids
 
     @staticmethod
     def from_file(filename: str) -> WordPieceProcessor:

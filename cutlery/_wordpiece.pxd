@@ -7,3 +7,4 @@ cdef class WordPieceProcessor:
     cdef unordered_map[string, size_t] initial_pieces
     cdef unordered_map[string, size_t] continuation_pieces
     cdef list _id_to_piece
+    cdef set _initial_piece_ids

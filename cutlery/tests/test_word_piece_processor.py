@@ -58,3 +58,9 @@ def test_to_list(toy_processor):
 
 def test_from_file(toy_processor_from_file):
     assert toy_processor_from_file.to_list() == TOKEN_PIECES
+
+
+def test_is_initial_piece_id(toy_processor):
+    assert [
+        toy_processor.is_initial_piece_id(id) for id in range(len(TOKEN_PIECES))
+    ] == [True, False, True, False, False]
