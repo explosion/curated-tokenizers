@@ -44,13 +44,14 @@ def toy_processor():
 
 def test_word_piece_processor_small_encode(toy_processor):
     for token, output in zip(EXAMPLE_TOKENS, EXAMPLE_ENCODINGS):
-        assert toy_processor.encode(token) == output
+        y = toy_processor.encode(token)
+        assert y == output
 
 
 def test_word_piece_processor_small_decode(toy_processor):
     for encoding, result in zip(EXAMPLE_ENCODINGS, EXAMPLE_DECODINGS):
         if -1 in encoding[0]:
-            with pytest.raises(ValueError):
+            with pytest.raises(RuntimeError):
                 toy_processor.decode(encoding[0])
         else:
             assert toy_processor.decode(encoding[0]) == result
@@ -66,7 +67,7 @@ def test_from_file(toy_processor_from_file):
 
 def test_get_initial(toy_processor):
     assert toy_processor.get_initial("voor") == 0
-    with pytest.raises(KeyError):
+    with pytest.raises(RuntimeError):
         toy_processor.get_initial("##tie")
 
 
