@@ -16,7 +16,6 @@ cdef class WordPieceProcessor:
         for idx, piece in enumerate(pieces):
             is_initial = not piece.startswith("##")
             byte_array = piece[2:].encode('utf8') if not is_initial else piece.encode('utf8')
-            # print(f"adding {piece}; {is_initial}")
             self._pieces.add_piece(byte_array, is_initial)
 
     def encode(self, token: str) -> Tuple[List[int], List[str]]:
