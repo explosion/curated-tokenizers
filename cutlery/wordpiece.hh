@@ -1,6 +1,10 @@
 #pragma once
 
-#include "merges.hh"
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+#include "util.hh"
 
 struct Piece {
     std::string piece;
