@@ -183,7 +183,7 @@ def setup_package():
         ),
         Extension(
             "cutlery._wordpiece",
-            ["cutlery/_wordpiece.pyx"],
+            ["cutlery/_wordpiece.pyx", "cutlery/wordpiece.cc"],
             language="c++",
         ),
         Extension(
