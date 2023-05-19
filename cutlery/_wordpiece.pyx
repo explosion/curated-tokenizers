@@ -47,7 +47,7 @@ cdef class WordPieceProcessor:
 
     def decode(self, pieces: Iterable[int]) -> str:
         """
-        Decode token piece identifiers into string. Raises a `ValueError` 
+        Decode token piece identifiers into string. Raises a `RuntimeError` 
         if any of the identifiers are invalid.
 
             ids (Iterable[int]): Piece IDs.
@@ -58,7 +58,7 @@ cdef class WordPieceProcessor:
 
     def get_initial(self, piece: str) -> int:
         """
-        Returns the ID for the given initial piece. Raises a `KeyError` if 
+        Returns the ID for the given initial piece. Raises a `RuntimeError` if 
         the string isn't an initial piece.
 
             piece (str): Initial piece string.
@@ -69,7 +69,7 @@ cdef class WordPieceProcessor:
     def id_to_piece(self, piece: int) -> Tuple[str, bool]:
         """
         Returns the piece string (without any prefix) for a given piece identifier 
-        and a boolean identifying if it is an initial piece. Raises a `ValueError` if 
+        and a boolean identifying if it is an initial piece. Raises a `RuntimeError` if 
         any of the identifiers are invalid.
 
             piece (int): Piece ID.
