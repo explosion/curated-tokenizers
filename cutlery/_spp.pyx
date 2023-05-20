@@ -84,6 +84,16 @@ cdef class SentencePieceProcessor:
 
         return pieces
 
+    def piece_to_id(self, str piece):
+        piece_bytes = piece.encode("utf8")
+        cdef string_view piece_view = string_view(piece_bytes, len(piece_bytes))
+        _check_status(deref(self.spp).status())
+        return deref(self.spp).PieceToId(piece_view)
+
+    def id_to_piece(self, int piece_id):
+        _check_status(deref(self.spp).status())
+        return deref(self.spp).IdToPiece(piece_id).decode("utf8")
+
     def bos_id(self):
         _check_status(deref(self.spp).status())
         return deref(self.spp).bos_id()
