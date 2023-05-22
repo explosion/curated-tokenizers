@@ -142,3 +142,18 @@ def _check_ids(spp):
     assert spp.pad_id() == -1  # Disabled in this model.
     ids = spp.encode_as_ids("I saw a girl with a telescope.")
     assert ids == [8, 465, 10, 947, 41, 10, 170, 168, 110, 28, 20, 143, 4]
+
+
+def test_id_to_piece_and_piece_to_id(toy_model):
+    assert toy_model.piece_to_id("<s>") == toy_model.bos_id()
+    assert toy_model.piece_to_id("</s>") == toy_model.eos_id()
+    assert toy_model.piece_to_id("<unk>") == toy_model.unk_id()
+    assert toy_model.piece_to_id("qotsa") == toy_model.unk_id()
+
+    assert toy_model.id_to_piece(toy_model.bos_id()) == "<s>"
+    assert toy_model.id_to_piece(toy_model.eos_id()) == "</s>"
+    assert toy_model.id_to_piece(toy_model.unk_id()) == "<unk>"
+    with pytest.raises(ValueError):
+        toy_model.id_to_piece(-1)
+    with pytest.raises(ValueError):
+        toy_model.id_to_piece(len(toy_model))

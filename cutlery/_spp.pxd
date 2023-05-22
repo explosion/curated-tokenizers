@@ -29,6 +29,8 @@ cdef extern from "sentencepiece_processor.h" namespace "sentencepiece":
         int pad_id() const
         int unk_id() const
         string serialized_model_proto() const
+        int PieceToId(string_view piece) const
+        const string &IdToPiece(int id) const
 
 
 cdef extern from "sentencepiece_processor.h" namespace "absl":
