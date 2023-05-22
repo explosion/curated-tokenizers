@@ -50,7 +50,8 @@ cdef class SentencePieceProcessor:
 
     def decode_from_ids(self, list ids) -> str:
         """
-        Decodes piece indentifiers to a string.
+        Decodes piece indentifiers to a string. Raises a `ValueError` if the
+        list elements are not integers.
 
             ids (List[int]): Piece IDs.
             RETURNS (str): Decoded string.
@@ -66,7 +67,8 @@ cdef class SentencePieceProcessor:
 
     def decode_from_pieces(self, list pieces) -> str:
         """
-        Decodes piece tokens to a string.
+        Decodes piece tokens to a string. Raises a `ValueError` if the
+        list elements are not strings.
 
             ids (List[str]): Piece tokens.
             RETURNS (str): Decoded string.
@@ -150,7 +152,8 @@ cdef class SentencePieceProcessor:
 
     def id_to_piece(self, int piece_id) -> str:
         """
-        Returns the piece token for a given piece identifier.
+        Returns the piece token for a given piece identifier. Raises a `ValueError` 
+        if the piece identifier is out-of-bounds.
 
             piece_id (int): Piece ID.
             RETURNS (str): Piece token.
