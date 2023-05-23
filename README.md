@@ -1,4 +1,4 @@
-# 🍴 cutlery
+# 🥢 Curated Tokenizers
 
 This Python library provides word-/sentencepiece tokenizers. The following
 types of tokenizers are currenty supported:
@@ -17,15 +17,15 @@ incompatible ways.
 
 ## ⏳ Install
 
-Cutlery is availble through PyPI:
+Curated tokenizers is availble through PyPI:
 
 ```bash
-pip install cutlery
+pip install curated_tokenizers
 ```
 
 ## 🚀 Quickstart
 
-The best way to get started with cutlery is through the
+The best way to get started with curated tokenizers is through the
 [`curated-transformers`](https://github.com/explosion/curated-transformers)
 library. `curated-transformers` also provides functionality to load tokenization
 models from Huggingface Hub.

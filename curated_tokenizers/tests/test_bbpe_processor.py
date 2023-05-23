@@ -1,4 +1,4 @@
-from cutlery import ByteBPEProcessor
+from curated_tokenizers import ByteBPEProcessor
 import json
 from pathlib import Path
 import pytest

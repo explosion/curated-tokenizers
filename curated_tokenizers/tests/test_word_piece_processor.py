@@ -1,4 +1,4 @@
-from cutlery import WordPieceProcessor
+from curated_tokenizers import WordPieceProcessor
 from pathlib import Path
 import pytest
 

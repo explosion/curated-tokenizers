@@ -30,11 +30,11 @@ jobs:
           python -m build --sdist
 
       - name: Run mypy
-        run: mypy cutlery
+        run: mypy curated_tokenizers
 
       - name: Delete source directory
         run: |
-          rm -rf cutlery
+          rm -rf curated_tokenizers
         shell: bash
 
       - name: Uninstall all packages
@@ -53,4 +53,4 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run pytest
-        run: python -m pytest --pyargs cutlery
+        run: python -m pytest --pyargs curated_tokenizers
