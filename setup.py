@@ -76,7 +76,7 @@ SENTENCEPIECE_SRC = prefix_path(
 
 PACKAGES = find_packages()
 MOD_NAMES = [
-    "cutlery.sp",
+    "curated_tokenizers.sp",
 ]
 COMPILE_OPTIONS = {
     "msvc": [
@@ -162,18 +162,18 @@ def setup_package():
     root = Path(__file__).parent
 
     if len(sys.argv) > 1 and sys.argv[1] == "clean":
-        return clean(root / "cutlery")
+        return clean(root / "curated_tokenizers")
 
     ext_modules = [
         Extension(
-            "cutlery._spp",
-            ["cutlery/_spp.pyx"]
+            "curated_tokenizers._spp",
+            ["curated_tokenizers/_spp.pyx"]
             + ABSL_SRC
             + PROTOBUF_LIGHT_SRC
             + SENTENCEPIECE_SRC
             + SENTENCEPIECE_PROTOBUF_SRC,
             include_dirs=[
-                "cutlery",
+                "curated_tokenizers",
                 "sentencepiece",
                 "sentencepiece/src",
                 "sentencepiece/src/builtin_pb",
@@ -182,14 +182,14 @@ def setup_package():
             language="c++",
         ),
         Extension(
-            "cutlery._wordpiece",
-            ["cutlery/_wordpiece.pyx", "cutlery/wordpiece.cc"],
+            "curated_tokenizers._wordpiece",
+            ["curated_tokenizers/_wordpiece.pyx", "curated_tokenizers/wordpiece.cc"],
             language="c++",
         ),
         Extension(
-            "cutlery._bbpe",
-            ["cutlery/_bbpe.pyx", "cutlery/merges.cc"],
-            include_dirs=["cutlery"],
+            "curated_tokenizers._bbpe",
+            ["curated_tokenizers/_bbpe.pyx", "curated_tokenizers/merges.cc"],
+            include_dirs=["curated_tokenizers"],
             language="c++",
         ),
     ]
@@ -198,7 +198,7 @@ def setup_package():
         ext_modules, compiler_directives=COMPILER_DIRECTIVES, language_level=2
     )
     setup(
-        name="cutlery",
+        name="curated-tokenizers",
         packages=PACKAGES,
         ext_modules=ext_modules,
         cmdclass={"build_ext": build_ext_subclass},

@@ -1,7 +1,7 @@
 from pathlib import Path
 import pytest
 
-from cutlery import SentencePieceProcessor
+from curated_tokenizers import SentencePieceProcessor
 
 
 @pytest.fixture(scope="module")
