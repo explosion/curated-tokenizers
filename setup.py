@@ -18,7 +18,7 @@ def prefix_path(prefix, files):
 
 
 ABSL_SRC = prefix_path(
-    "sentencepiece/third_party/absl", ["flags/flag.cc", "strings/string_view.cc"]
+    "sentencepiece/third_party/absl", ["flags/flag.cc"]
 )
 
 PROTOBUF_LIGHT_SRC = prefix_path(
@@ -80,18 +80,17 @@ MOD_NAMES = [
 ]
 COMPILE_OPTIONS = {
     "msvc": [
+        "/std:c++17",
         "/Ox",
         "/EHsc",
-        "/D_USE_INTERNAL_STRING_VIEW",
         "/DHAVE_PTHREAD",
         "/wd4018",
         "/wd4514",
     ],
     "other": [
-        "--std=c++14",
+        "--std=c++17",
         "-Wno-sign-compare" "-Wno-strict-prototypes",
         "-Wno-unused-function",
-        "-D_USE_INTERNAL_STRING_VIEW",
         "-pthread",
         "-DHAVE_PTHREAD=1",
     ],
