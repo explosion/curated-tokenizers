@@ -139,8 +139,8 @@ cdef class SentencePieceProcessor:
 
     def piece_to_id(self, str piece) -> int:
         """
-        Returns the piece identifier for a given piece token. Returns the 
-        `unk` piece identifier if the piece token is OOV.
+        Returns the piece identifier for a given piece token. Raises a 
+        `ValueError` if the piece token is OOV.
 
             piece (str): Piece token.
             RETURNS (int): Piece ID.
@@ -148,7 +148,12 @@ cdef class SentencePieceProcessor:
         piece_bytes = piece.encode("utf8")
         cdef string_view piece_view = string_view(piece_bytes, len(piece_bytes))
         _check_status(deref(self.spp).status())
-        return deref(self.spp).PieceToId(piece_view)
+        cdef int piece_id = deref(self.spp).PieceToId(piece_view)
+        cdef int unk_id = self.unk_id()
+        cdef str unk_piece = self.id_to_piece(unk_id)
+        if piece_id == self.unk_id() and piece != unk_piece:
+            raise ValueError(f"Unknown piece token `{piece}`")
+        return piece_id
 
     def id_to_piece(self, int piece_id) -> str:
         """
@@ -161,7 +166,7 @@ cdef class SentencePieceProcessor:
         _check_status(deref(self.spp).status())
         cdef int vocab_size = deref(self.spp).GetPieceSize()
         if not 0 <= piece_id < vocab_size:
-            raise ValueError(f"piece ID must be in range [0,{vocab_size}), got {piece_id}")
+            raise ValueError(f"Piece ID must be in range [0,{vocab_size}), got {piece_id}")
         return deref(self.spp).IdToPiece(piece_id).decode("utf8")
 
     def bos_id(self) -> int:

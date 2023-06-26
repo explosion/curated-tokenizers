@@ -1,6 +1,6 @@
 from pathlib import Path
-import pytest
 
+import pytest
 from curated_tokenizers import SentencePieceProcessor
 
 
@@ -148,7 +148,9 @@ def test_id_to_piece_and_piece_to_id(toy_model):
     assert toy_model.piece_to_id("<s>") == toy_model.bos_id()
     assert toy_model.piece_to_id("</s>") == toy_model.eos_id()
     assert toy_model.piece_to_id("<unk>") == toy_model.unk_id()
-    assert toy_model.piece_to_id("qotsa") == toy_model.unk_id()
+
+    with pytest.raises(ValueError):
+        toy_model.piece_to_id("qotsa")
 
     assert toy_model.id_to_piece(toy_model.bos_id()) == "<s>"
     assert toy_model.id_to_piece(toy_model.eos_id()) == "</s>"
