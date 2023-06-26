@@ -1,5 +1,5 @@
 from cython.operator cimport dereference as deref
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 cdef class SentencePieceProcessor:
     def __cinit__(self):
@@ -137,32 +137,39 @@ cdef class SentencePieceProcessor:
 
         return pieces
 
-    def piece_to_id(self, str piece) -> int:
+    def piece_to_id(self, str piece) -> Optional[int]:
         """
-        Returns the piece identifier for a given piece token. Returns the 
-        `unk` piece identifier if the piece token is OOV.
+        Returns the piece identifier for a given piece token, or 
+        `None` if the piece token is OOV.
 
             piece (str): Piece token.
-            RETURNS (int): Piece ID.
+            RETURNS (int): Piece ID or None.
         """
         piece_bytes = piece.encode("utf8")
         cdef string_view piece_view = string_view(piece_bytes, len(piece_bytes))
         _check_status(deref(self.spp).status())
-        return deref(self.spp).PieceToId(piece_view)
+        cdef int piece_id = deref(self.spp).PieceToId(piece_view)
+        cdef int unk_id = self.unk_id()
+        cdef str unk_piece = self.id_to_piece(unk_id)
+        if piece_id == self.unk_id() and piece != unk_piece:
+            return None
+        else:
+            return piece_id
 
-    def id_to_piece(self, int piece_id) -> str:
+    def id_to_piece(self, int piece_id) -> Optional[str]:
         """
-        Returns the piece token for a given piece identifier. Raises a `ValueError` 
-        if the piece identifier is out-of-bounds.
+        Returns the piece token for a given piece identifier, or
+        `None` if the piece identifier is out-of-bounds.
 
             piece_id (int): Piece ID.
-            RETURNS (str): Piece token.
+            RETURNS (str): Piece token or None.
         """
         _check_status(deref(self.spp).status())
         cdef int vocab_size = deref(self.spp).GetPieceSize()
         if not 0 <= piece_id < vocab_size:
-            raise ValueError(f"piece ID must be in range [0,{vocab_size}), got {piece_id}")
-        return deref(self.spp).IdToPiece(piece_id).decode("utf8")
+            return None
+        else:
+            return deref(self.spp).IdToPiece(piece_id).decode("utf8")
 
     def bos_id(self) -> int:
         """Returns the piece identifier for the `bos` meta token."""

@@ -1,7 +1,8 @@
-from curated_tokenizers import ByteBPEProcessor
 import json
 from pathlib import Path
+
 import pytest
+from curated_tokenizers import ByteBPEProcessor
 
 
 @pytest.fixture(scope="module")
@@ -59,6 +60,7 @@ def test_empty_processor():
         "n",
     ]
 
+
 def test_can_decode(toy_processor):
     assert toy_processor.decode_from_ids(EXAMPLE_PIECE_IDS) == EXAMPLE_TEXT
 
@@ -81,3 +83,13 @@ def test_rejects_incorrect_merges(test_dir):
             vocab=test_dir / "robbert-vocab-1000.json",
             merges=test_dir / "incorrect-merges.txt",
         )
+
+
+def test_id_to_piece_and_piece_to_id(toy_processor):
+    assert toy_processor.piece_to_id("woord") == 4083
+    assert toy_processor.piece_to_id("Ġwebsite") == 258
+    assert toy_processor.piece_to_id("kglw") is None
+
+    assert toy_processor.id_to_piece(207) == "ĠNederland"
+    assert toy_processor.id_to_piece(113) == "Ġdoen"
+    assert toy_processor.id_to_piece(99999) is None
