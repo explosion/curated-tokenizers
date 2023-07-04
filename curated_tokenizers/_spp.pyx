@@ -42,6 +42,8 @@ cdef class SentencePieceProcessor:
                 protocol buffer.
         """
         cdef SentencePieceProcessor processor = SentencePieceProcessor.__new__(SentencePieceProcessor)
+        if len(protobuf) == 0:
+            return processor
         cdef string_view protobuf_view = string_view(protobuf, len(protobuf))
         _check_status(deref(processor.spp).LoadFromSerializedProto(protobuf_view))
         return processor

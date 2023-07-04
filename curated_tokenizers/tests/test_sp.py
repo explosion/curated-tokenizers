@@ -1,6 +1,6 @@
 from pathlib import Path
-import pytest
 
+import pytest
 from curated_tokenizers import SentencePieceProcessor
 
 
@@ -21,6 +21,10 @@ def test_load_proto(test_dir):
     _check_ids(spp)
     serialized_data = spp.to_protobuf()
     assert serialized_data == data
+
+    # Zero-length buffer.
+    spp = SentencePieceProcessor.from_protobuf(bytes())
+    assert spp.to_protobuf() == bytes()
 
 
 def test_load_unknown_file():
