@@ -139,9 +139,13 @@ cdef class ByteBPEProcessor:
         merges_bytes = deref(self._merges).merges()
         return [(m1.decode('utf-8'), m2.decode('utf-8')) for m1, m2 in merges_bytes]
 
-    def piece_id(self, piece: str) -> Optional[int]:
+    def piece_to_id(self, piece: str) -> Optional[int]:
         """Get the identifier for a piece."""
         return self._piece_to_id.get(piece)
+
+    def id_to_piece(self, piece_id: int) -> Optional[str]:
+        """Get the piece for an identifier."""
+        return self._id_to_piece.get(piece_id)
 
     @property
     def vocab(self) -> Dict[str, int]:

@@ -1,7 +1,7 @@
-from curated_tokenizers import WordPieceProcessor
 from pathlib import Path
-import pytest
 
+import pytest
+from curated_tokenizers import WordPieceProcessor
 
 EXAMPLE_TOKENS = [
     "voor",
@@ -51,7 +51,7 @@ def test_word_piece_processor_small_encode(toy_processor):
 def test_word_piece_processor_small_decode(toy_processor):
     for encoding, result in zip(EXAMPLE_ENCODINGS, EXAMPLE_DECODINGS):
         if -1 in encoding[0]:
-            with pytest.raises(RuntimeError):
+            with pytest.raises(ValueError):
                 toy_processor.decode(encoding[0])
         else:
             assert toy_processor.decode(encoding[0]) == result
@@ -65,10 +65,14 @@ def test_from_file(toy_processor_from_file):
     assert toy_processor_from_file.to_list() == TOKEN_PIECES
 
 
-def test_get_initial(toy_processor):
+def test_get_initial_and_id_to_piece(toy_processor):
     assert toy_processor.get_initial("voor") == 0
-    with pytest.raises(RuntimeError):
-        toy_processor.get_initial("##tie")
+    assert toy_processor.get_initial("tie") is None
+    assert toy_processor.get_initial("##tie") is None
+
+    assert toy_processor.id_to_piece(2) == ("coördina", True)
+    assert toy_processor.id_to_piece(1) == ("tie", False)
+    assert toy_processor.id_to_piece(999) is None
 
 
 def test_piece_id_valid(toy_processor):

@@ -1,4 +1,4 @@
-from typing import List, Tuple, Iterable
+from typing import List, Tuple, Iterable, Optional
 from cython.operator cimport dereference as deref
 from libcpp cimport pair
 
@@ -47,37 +47,51 @@ cdef class WordPieceProcessor:
 
     def decode(self, pieces: Iterable[int]) -> str:
         """
-        Decode token piece identifiers into string. Raises a `RuntimeError` 
+        Decode token piece identifiers into string. Raises a `ValueError` 
         if any of the identifiers are invalid.
 
             ids (Iterable[int]): Piece IDs.
             RETURNS (str): Decoded string.
         """
-        token_pieces = [self.id_to_piece(id)[0] for id in pieces]
+        token_pieces = []
+        for piece_id in pieces:
+            piece = self.id_to_piece(piece_id)
+            if piece is None:
+                raise ValueError(f"Piece ID `{piece_id}` is invalid")
+            else:
+                token_pieces.append(piece[0])
         return "".join(token_pieces)
 
-    def get_initial(self, piece: str) -> int:
+    def get_initial(self, piece: str) -> Optional[int]:
         """
-        Returns the ID for the given initial piece. Raises a `RuntimeError` if 
+        Returns the ID for the given initial piece, or `None` if
         the string isn't an initial piece.
 
             piece (str): Initial piece string.
-            RETURNS (int): Piece ID.
+            RETURNS (Optional[int]): Piece ID or None
         """
-        return self._pieces.piece_to_id(Piece(piece.encode('utf8'), True))
+        try:
+            return self._pieces.piece_to_id(Piece(piece.encode('utf8'), True))
+        except RuntimeError:
+            return None
 
     def id_to_piece(self, piece: int) -> Tuple[str, bool]:
         """
         Returns the piece string (without any prefix) for a given piece identifier 
-        and a boolean identifying if it is an initial piece. Raises a `RuntimeError` if 
-        any of the identifiers are invalid.
+        and a boolean identifying if it is an initial piece. Returns `None` if the 
+        piece identifier is invalid.
 
             piece (int): Piece ID.
-            RETURNS (Tuple[str, bool]): Piece string and a boolean identifying if
-                it is an initial piece.
+            RETURNS (Optional[Tuple[str, bool]]): 
+                Piece string and a boolean identifying if it is an initial piece,
+                or None
         """
-        cdef const Piece* ptr_piece = &self._pieces.id_to_piece(piece)
-        return (ptr_piece[0].piece.decode('utf8'), ptr_piece[0].is_initial) 
+        cdef const Piece* ptr_piece
+        try:
+            ptr_piece = &self._pieces.id_to_piece(piece)
+            return (ptr_piece[0].piece.decode('utf8'), ptr_piece[0].is_initial) 
+        except RuntimeError:
+            return None
 
     def is_valid_piece_id(self, piece: int) -> bool:
         """
