@@ -18,6 +18,19 @@ cdef class WordPieceProcessor:
             byte_array = piece[2:].encode('utf8') if not is_initial else piece.encode('utf8')
             self._pieces.add_piece(byte_array, is_initial)
 
+    def __copy__(self):
+        cls = self.__class__
+        data = self.to_list()
+        result = cls(data)
+        return result
+
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        data = self.to_list()
+        result = cls(data)
+        memo[id(self)] = result
+        return result
+
     def encode(self, token: str) -> Tuple[List[int], List[str]]:
         """
         Encode a token using word pieces. The piece identifiers are
