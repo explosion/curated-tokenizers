@@ -22,6 +22,10 @@ def test_load_proto(test_dir):
     serialized_data = spp.to_protobuf()
     assert serialized_data == data
 
+    # Zero-length buffer.
+    spp = SentencePieceProcessor.from_protobuf(bytes())
+    assert spp.to_protobuf() == bytes()
+
 
 def test_load_unknown_file():
     with pytest.raises(OSError, match=r"No such file"):

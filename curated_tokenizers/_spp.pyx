@@ -12,6 +12,14 @@ cdef class SentencePieceProcessor:
         _check_status(deref(self.spp).status())
         return deref(self.spp).GetPieceSize()
 
+    def __copy__(self):
+        return SentencePieceProcessor.from_protobuf(self.to_protobuf())
+
+    def __deepcopy__(self, memo):
+        result = SentencePieceProcessor.from_protobuf(self.to_protobuf())
+        memo[id(self)] = result
+        return result
+
     @staticmethod
     def from_file(str filename):
         """
@@ -34,6 +42,9 @@ cdef class SentencePieceProcessor:
                 protocol buffer.
         """
         cdef SentencePieceProcessor processor = SentencePieceProcessor.__new__(SentencePieceProcessor)
+        if len(protobuf) == 0:
+            # SentencePiece returns an empty protobuf for uninitialized models.
+            return processor
         cdef string_view protobuf_view = string_view(protobuf, len(protobuf))
         _check_status(deref(processor.spp).LoadFromSerializedProto(protobuf_view))
         return processor
