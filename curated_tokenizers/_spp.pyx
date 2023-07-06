@@ -43,6 +43,7 @@ cdef class SentencePieceProcessor:
         """
         cdef SentencePieceProcessor processor = SentencePieceProcessor.__new__(SentencePieceProcessor)
         if len(protobuf) == 0:
+            # SentencePiece returns an empty protobuf for uninitialized models.
             return processor
         cdef string_view protobuf_view = string_view(protobuf, len(protobuf))
         _check_status(deref(processor.spp).LoadFromSerializedProto(protobuf_view))

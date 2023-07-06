@@ -19,17 +19,11 @@ cdef class WordPieceProcessor:
             self._pieces.add_piece(byte_array, is_initial)
 
     def __copy__(self):
-        cls = self.__class__
-        data = self.to_list()
-        result = cls(data)
-        return result
+        # This is essentially a deepcopy, but there's no better way to do it.
+        return WordPieceProcessor(self.to_list())
 
     def __deepcopy__(self, memo):
-        cls = self.__class__
-        data = self.to_list()
-        result = cls(data)
-        memo[id(self)] = result
-        return result
+        return WordPieceProcessor(self.to_list())
 
     def encode(self, token: str) -> Tuple[List[int], List[str]]:
         """

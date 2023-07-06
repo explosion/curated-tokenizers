@@ -70,9 +70,9 @@ cdef class ByteBPEProcessor:
         return ByteBPEProcessor(vocab=self.vocab, merges=self.merges)
 
     def __deepcopy__(self, memo):
-        result = ByteBPEProcessor(vocab=self.vocab, merges=self.merges)
-        memo[id(self)] = result
-        return result
+        # We don't need a deepcopy of the vocab and merges dicts as their
+        # contents will be copied into a backing store in the c'tor.
+        return ByteBPEProcessor(vocab=self.vocab, merges=self.merges)
 
     @staticmethod
     def load_from_files(*, vocab: Path, merges: Path) -> ByteBPEProcessor:
