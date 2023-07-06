@@ -66,6 +66,14 @@ cdef class ByteBPEProcessor:
             c_merges.push_back(pair[string, string](p1.encode('utf-8'), p2.encode('utf-8')))
         self._merges = make_shared[Merges](c_merges)
 
+    def __copy__(self):
+        return ByteBPEProcessor(vocab=self.vocab, merges=self.merges)
+
+    def __deepcopy__(self, memo):
+        # We don't need a deepcopy of the vocab and merges dicts as their
+        # contents will be copied into a backing store in the c'tor.
+        return ByteBPEProcessor(vocab=self.vocab, merges=self.merges)
+
     @staticmethod
     def load_from_files(*, vocab: Path, merges: Path) -> ByteBPEProcessor:
         """Construct a processor from the given vocabulary and merges files."""
