@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import sys
-import distutils.util
-from distutils.command.build_ext import build_ext
+from setuptools.command.build_ext import build_ext
 from setuptools import Extension, setup, find_packages
 from pathlib import Path
 from Cython.Build import cythonize
@@ -102,30 +101,6 @@ COMPILER_DIRECTIVES = {
     "annotation_typing": False,
 }
 LINK_OPTIONS = {"msvc": [], "other": []}
-
-
-def is_new_osx():
-    """Check whether we're on OSX >= 10.10"""
-    name = distutils.util.get_platform()
-    if sys.platform != "darwin":
-        return False
-    elif name.startswith("macosx-10"):
-        minor_version = int(name.split("-")[1].split(".")[1])
-        if minor_version >= 7:
-            return True
-        else:
-            return False
-    else:
-        return False
-
-
-if is_new_osx():
-    # On Mac, use libc++ because Apple deprecated use of libstdc
-    COMPILE_OPTIONS["other"].append("-stdlib=libc++")
-    LINK_OPTIONS["other"].append("-lc++")
-    # g++ (used by unix compiler on mac) links to libstdc++ as a default lib.
-    # See: https://stackoverflow.com/questions/1653047/avoid-linking-to-libstdc
-    LINK_OPTIONS["other"].append("-nodefaultlibs")
 
 
 # By subclassing build_extensions we have the actual compiler that will be used
