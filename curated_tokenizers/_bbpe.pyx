@@ -1,14 +1,21 @@
 # cython: infer_types
 
 from typing import Dict, Iterable, List, Optional, Tuple
+
 from cython.operator cimport dereference as deref
+
+import json
 from functools import lru_cache
 from io import BytesIO
-import json
+
 from libcpp.memory cimport make_shared, shared_ptr
+
 from pathlib import Path
+
 import regex
 
+from ._util import open_file_like
+from .types import FileLike
 
 # We need the same splitting pattern and byte -> string remapping as GPT-2,
 # so these are taken directly from:
@@ -75,11 +82,16 @@ cdef class ByteBPEProcessor:
         return ByteBPEProcessor(vocab=self.vocab, merges=self.merges)
 
     @staticmethod
-    def load_from_files(*, vocab: Path, merges: Path) -> ByteBPEProcessor:
-        """Construct a processor from the given vocabulary and merges files."""
-        with open(vocab, encoding="utf-8") as f:
+    def load_from_files(*, vocab: FileLike, merges: FileLike) -> ByteBPEProcessor:
+        """
+        Construct a processor from the given vocabulary and merges files.
+
+        If the vocabulary and merges files are file objects, the caller is
+        responsible for closing them.
+        """
+        with open_file_like(vocab, encoding="utf-8") as f:
             vocab = json.load(f)
-        with open(merges, encoding="utf-8") as f:
+        with open_file_like(merges, encoding="utf-8") as f:
             version = f.readline()
             if not version.startswith("#version: 0.2"):
                 raise ValueError(f"Only version 0.2 of the merges format is supported, was: {version.strip()}")

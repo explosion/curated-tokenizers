@@ -1,6 +1,7 @@
 from libcpp.string cimport string
-from libcpp.vector cimport vector
 from libcpp.utility cimport pair
+from libcpp.vector cimport vector
+
 
 cdef extern from "merges.hh":
     cdef cppclass Merges:

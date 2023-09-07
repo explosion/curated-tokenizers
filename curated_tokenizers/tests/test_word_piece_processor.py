@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pytest
+
 from curated_tokenizers import WordPieceProcessor
 
 EXAMPLE_TOKENS = [

@@ -1,5 +1,10 @@
 from cython.operator cimport dereference as deref
-from typing import List, Tuple, Optional
+
+from pathlib import Path
+from typing import List, Optional, Tuple
+
+from .types import FileLike
+
 
 cdef class SentencePieceProcessor:
     def __cinit__(self):
@@ -21,16 +26,20 @@ cdef class SentencePieceProcessor:
         return result
 
     @staticmethod
-    def from_file(str filename):
+    def from_file(file: FileLike):
         """
         Constructs a SentencePieceProcessor by loading a serialized model from
         disk.
 
-            filename (str): Path to model.
+            file (FileLike): Model file.
         """
-        cdef SentencePieceProcessor processor = SentencePieceProcessor.__new__(SentencePieceProcessor)
-        _check_status(deref(processor.spp).Load(filename.encode("utf-8")))
-        return processor
+        cdef SentencePieceProcessor processor
+        if isinstance(file, Path) or isinstance(file, str):
+            processor = SentencePieceProcessor.__new__(SentencePieceProcessor)
+            _check_status(deref(processor.spp).Load(str(file).encode("utf-8")))
+            return processor
+        else:
+            return SentencePieceProcessor.from_protobuf(file.read())
 
     @staticmethod
     def from_protobuf(bytes protobuf):

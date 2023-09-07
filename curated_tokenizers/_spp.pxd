@@ -3,6 +3,7 @@ from libcpp.memory cimport shared_ptr
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 
+
 cdef extern from "builtin_pb/sentencepiece.pb.h" namespace "sentencepiece":
     cdef cppclass SentencePieceText_SentencePiece:
         uint32_t id() const
