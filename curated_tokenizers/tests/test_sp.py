@@ -1,7 +1,25 @@
 from pathlib import Path
 
 import pytest
+
 from curated_tokenizers import SentencePieceProcessor
+
+EXAMPLE_PIECE_IDS = [8, 465, 10, 947, 41, 10, 170, 168, 110, 28, 20, 143, 4]
+EXAMPLE_PIECES = [
+    "▁I",
+    "▁saw",
+    "▁a",
+    "▁girl",
+    "▁with",
+    "▁a",
+    "▁t",
+    "el",
+    "es",
+    "c",
+    "o",
+    "pe",
+    ".",
+]
 
 
 @pytest.fixture(scope="module")
@@ -10,8 +28,13 @@ def test_dir(request):
 
 
 @pytest.fixture
-def toy_model(test_dir):
-    return SentencePieceProcessor.from_file(str(test_dir / "toy.model"))
+def toy_model_path(test_dir):
+    return test_dir / "toy.model"
+
+
+@pytest.fixture
+def toy_model(toy_model_path):
+    return SentencePieceProcessor.from_file(toy_model_path)
 
 
 def test_load_proto(test_dir):
@@ -39,30 +62,12 @@ def test_handles_nul_character(toy_model):
 
 
 def test_decode_from_ids(toy_model):
-    decoded = toy_model.decode_from_ids(
-        [8, 465, 10, 947, 41, 10, 170, 168, 110, 28, 20, 143, 4]
-    )
+    decoded = toy_model.decode_from_ids(EXAMPLE_PIECE_IDS)
     assert decoded == "I saw a girl with a telescope."
 
 
 def test_decode_from_pieces(toy_model):
-    decoded = toy_model.decode_from_pieces(
-        [
-            "▁I",
-            "▁saw",
-            "▁a",
-            "▁girl",
-            "▁with",
-            "▁a",
-            "▁t",
-            "el",
-            "es",
-            "c",
-            "o",
-            "pe",
-            ".",
-        ]
-    )
+    decoded = toy_model.decode_from_pieces(EXAMPLE_PIECES)
     assert decoded == "I saw a girl with a telescope."
 
 
@@ -75,22 +80,8 @@ def test_decode_with_pieces_rejects_inccorect_type(toy_model):
 
 def test_encode(toy_model):
     ids, pieces = toy_model.encode("I saw a girl with a telescope.")
-    assert ids == [8, 465, 10, 947, 41, 10, 170, 168, 110, 28, 20, 143, 4]
-    assert pieces == [
-        "▁I",
-        "▁saw",
-        "▁a",
-        "▁girl",
-        "▁with",
-        "▁a",
-        "▁t",
-        "el",
-        "es",
-        "c",
-        "o",
-        "pe",
-        ".",
-    ]
+    assert ids == EXAMPLE_PIECE_IDS
+    assert pieces == EXAMPLE_PIECES
 
 
 def test_encode_as_ids(toy_model):
@@ -99,21 +90,7 @@ def test_encode_as_ids(toy_model):
 
 def test_encode_as_pieces(toy_model):
     pieces = toy_model.encode_as_pieces("I saw a girl with a telescope.")
-    assert pieces == [
-        "▁I",
-        "▁saw",
-        "▁a",
-        "▁girl",
-        "▁with",
-        "▁a",
-        "▁t",
-        "el",
-        "es",
-        "c",
-        "o",
-        "pe",
-        ".",
-    ]
+    assert pieces == EXAMPLE_PIECES
 
 
 def test_uninitialized_model():
@@ -145,7 +122,7 @@ def _check_ids(spp):
     assert spp.unk_id() == 0
     assert spp.pad_id() == -1  # Disabled in this model.
     ids = spp.encode_as_ids("I saw a girl with a telescope.")
-    assert ids == [8, 465, 10, 947, 41, 10, 170, 168, 110, 28, 20, 143, 4]
+    assert ids == EXAMPLE_PIECE_IDS
 
 
 def test_id_to_piece_and_piece_to_id(toy_model):
@@ -159,3 +136,11 @@ def test_id_to_piece_and_piece_to_id(toy_model):
     assert toy_model.id_to_piece(toy_model.unk_id()) == "<unk>"
     assert toy_model.id_to_piece(-1) is None
     assert toy_model.id_to_piece(len(toy_model)) is None
+
+
+def test_can_load_from_file_object(toy_model_path):
+    with open(toy_model_path, "rb") as f:
+        toy_model = SentencePieceProcessor.from_file(f)
+    ids, pieces = toy_model.encode("I saw a girl with a telescope.")
+    assert ids == EXAMPLE_PIECE_IDS
+    assert pieces == EXAMPLE_PIECES

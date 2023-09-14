@@ -1,6 +1,8 @@
-from typing import List, Tuple, Iterable, Optional
+from typing import Iterable, List, Optional, Tuple
+
 from cython.operator cimport dereference as deref
 from libcpp cimport pair
+
 
 cdef struct PieceMatch:
     bint found
