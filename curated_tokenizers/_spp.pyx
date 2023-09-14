@@ -31,6 +31,9 @@ cdef class SentencePieceProcessor:
         Constructs a SentencePieceProcessor by loading a serialized model from
         disk.
 
+        When the argument is a file object, the caller is responsible for
+        closing it.
+
             file (FileLike): Model file.
         """
         cdef SentencePieceProcessor processor

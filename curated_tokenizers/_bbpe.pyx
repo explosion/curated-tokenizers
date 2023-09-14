@@ -86,7 +86,7 @@ cdef class ByteBPEProcessor:
         """
         Construct a processor from the given vocabulary and merges files.
 
-        If the vocabulary and merges files are file objects, the caller is
+        When the vocabulary and merges files are file objects, the caller is
         responsible for closing them.
         """
         with open_file_like(vocab, encoding="utf-8") as f:
