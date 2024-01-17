@@ -150,4 +150,5 @@ def test_can_load_from_file_object(toy_model_path):
 def test_pickle(toy_model):
     serialized = dumps(toy_model)
     deserialized = loads(serialized)
+    assert isinstance(deserialized, SentencePieceProcessor)
     assert deserialized.to_protobuf() == toy_model.to_protobuf()

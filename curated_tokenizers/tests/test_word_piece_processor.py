@@ -87,4 +87,5 @@ def test_piece_id_valid(toy_processor):
 def test_pickle(toy_processor):
     serialized = dumps(toy_processor)
     deserialized = loads(serialized)
+    assert isinstance(deserialized, WordPieceProcessor)
     assert deserialized.to_list() == toy_processor.to_list()
