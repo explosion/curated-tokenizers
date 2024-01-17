@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from pickle import dumps, loads
 
 import pytest
 
@@ -114,3 +115,11 @@ def test_can_load_from_file_object(vocab_path, merges_path):
                 merges=merges,
             )
     assert toy_processor.encode(EXAMPLE_TEXT) == (EXAMPLE_PIECE_IDS, EXAMPLE_PIECES)
+
+
+def test_pickle(toy_processor):
+    serialized = dumps(toy_processor)
+    deserialized = loads(serialized)
+    assert isinstance(deserialized, ByteBPEProcessor)
+    assert deserialized.vocab == toy_processor.vocab
+    assert deserialized.merges == toy_processor.merges
