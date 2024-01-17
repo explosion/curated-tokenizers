@@ -165,3 +165,10 @@ cdef class ByteBPEProcessor:
             piece_ids.append(piece_id)
 
         return piece_ids
+
+    def __reduce__(self):
+        return (unpickle_byte_bpe_processor, (self.vocab, self.merges,))
+
+def unpickle_byte_bpe_processor(vocab: Dict[str, int],
+                                merges: List[Tuple[str, str]]) -> ByteBPEProcessor:
+    return ByteBPEProcessor(vocab, merges)
