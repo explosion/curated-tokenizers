@@ -1,4 +1,6 @@
 from pathlib import Path
+from pickle import dumps, loads
+
 import pytest
 
 from curated_tokenizers import SentencePieceProcessor
@@ -161,3 +163,10 @@ def test_id_to_piece_and_piece_to_id(toy_model):
         toy_model.id_to_piece(-1)
     with pytest.raises(ValueError):
         toy_model.id_to_piece(len(toy_model))
+
+
+def test_pickle(toy_model):
+    serialized = dumps(toy_model)
+    deserialized = loads(serialized)
+    assert isinstance(deserialized, SentencePieceProcessor)
+    assert deserialized.to_protobuf() == toy_model.to_protobuf()

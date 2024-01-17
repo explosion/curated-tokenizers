@@ -1,7 +1,9 @@
-from curated_tokenizers import ByteBPEProcessor
-import json
 from pathlib import Path
+from pickle import dumps, loads
+
 import pytest
+
+from curated_tokenizers import ByteBPEProcessor
 
 
 @pytest.fixture(scope="module")
@@ -59,6 +61,7 @@ def test_empty_processor():
         "n",
     ]
 
+
 def test_can_decode(toy_processor):
     assert toy_processor.decode_from_ids(EXAMPLE_PIECE_IDS) == EXAMPLE_TEXT
 
@@ -81,3 +84,11 @@ def test_rejects_incorrect_merges(test_dir):
             vocab=test_dir / "robbert-vocab-1000.json",
             merges=test_dir / "incorrect-merges.txt",
         )
+
+
+def test_pickle(toy_processor):
+    serialized = dumps(toy_processor)
+    deserialized = loads(serialized)
+    assert isinstance(deserialized, ByteBPEProcessor)
+    assert deserialized.vocab == toy_processor.vocab
+    assert deserialized.merges == toy_processor.merges

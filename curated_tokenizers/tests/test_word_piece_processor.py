@@ -1,7 +1,9 @@
-from curated_tokenizers import WordPieceProcessor
 from pathlib import Path
+from pickle import dumps, loads
+
 import pytest
 
+from curated_tokenizers import WordPieceProcessor
 
 EXAMPLE_TOKENS = [
     "voor",
@@ -76,3 +78,10 @@ def test_piece_id_valid(toy_processor):
     assert toy_processor.is_valid_piece_id(0) == True
     assert toy_processor.is_valid_piece_id(len(TOKEN_PIECES)) == False
     assert toy_processor.is_valid_piece_id(len(TOKEN_PIECES) - 1) == True
+
+
+def test_pickle(toy_processor):
+    serialized = dumps(toy_processor)
+    deserialized = loads(serialized)
+    assert isinstance(deserialized, WordPieceProcessor)
+    assert deserialized.to_list() == toy_processor.to_list()
