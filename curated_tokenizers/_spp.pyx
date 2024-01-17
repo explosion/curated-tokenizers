@@ -234,5 +234,5 @@ cdef _check_status(Status status):
     else:
         raise ValueError(status.error_message().decode("utf-8"))
 
-def unpickle_sentence_piece_processor(protobuf: bytes):
+def unpickle_sentence_piece_processor(protobuf: bytes) -> SentencePieceProcessor:
     return SentencePieceProcessor.from_protobuf(protobuf)
