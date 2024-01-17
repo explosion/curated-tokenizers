@@ -1,4 +1,5 @@
 from pathlib import Path
+from pickle import dumps, loads
 
 import pytest
 
@@ -144,3 +145,9 @@ def test_can_load_from_file_object(toy_model_path):
     ids, pieces = toy_model.encode("I saw a girl with a telescope.")
     assert ids == EXAMPLE_PIECE_IDS
     assert pieces == EXAMPLE_PIECES
+
+
+def test_pickle(toy_model):
+    serialized = dumps(toy_model)
+    deserialized = loads(serialized)
+    assert deserialized.to_protobuf() == toy_model.to_protobuf()

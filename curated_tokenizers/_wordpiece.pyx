@@ -144,3 +144,9 @@ cdef class WordPieceProcessor:
                 return match
 
         return match
+
+    def __reduce__(self):
+        return (unpickle_wordpiece_processor, (self.to_list(),))
+
+def unpickle_wordpiece_processor(pieces: List[str]) -> WordPieceProcessor:
+    return WordPieceProcessor(pieces)
