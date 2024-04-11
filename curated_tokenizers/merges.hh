@@ -1,13 +1,13 @@
 #pragma once
 
-#include <string>
+#include <cstddef>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
 #include "util.hh"
 
-typedef std::pair<std::string, std::string> string_pair;
+typedef std::pair<int, int> merge_pair;
 
 struct PairHash {
     template <typename T, typename U>
@@ -19,26 +19,44 @@ struct PairHash {
     }
 };
 
+/**
+ * Merge operation.
+ */
+struct Merge {
+    merge_pair merge;
+    int merged_id;
+};
+
+
+/**
+ * Value of merges used in the merge lookup table. 
+ */
+struct MergeValue {
+    int rank;
+    int merged_id;
+};
+
+typedef std::unordered_map<merge_pair, MergeValue, PairHash> MergesMap;
+
 class Merges {
 public:
-    Merges(std::vector<string_pair> const &merges);
+    Merges(std::vector<Merge> const &merges);
 
     /**
-     * Apply merges to the given an initial set of pieces (usually string
-     * representations of bytes).
+     * Apply merges to the given an initial set of piece ids.
      * 
-     * @param pieces The pieces to merge
-     * @return std::vector<std::string> Pieces after applying merges.
+     * @param ids The ids to merge
+     * @return std::vector<int> Ids after applying merges.
      */
-    std::vector<std::string> apply_merges(std::vector<std::string> pieces) const;
+    std::vector<int> apply_merges(std::vector<int> pieces) const;
     
     /**
      * Get all merges used by the BBPE instance.
      * 
-     * @return std::vector<std::pair<std::string, std::string>> 
+     * @return std::vector<std::pair<int, int>> 
      */
-    std::vector<std::pair<std::string, std::string>> merges() const;
+    std::vector<merge_pair> merges() const;
 private:
-    string_pair find_best_pair(std::vector<std::string> const &pieces) const;
-    std::unordered_map<string_pair, size_t, PairHash> _merges;
+    MergesMap::const_iterator find_best_pair(std::vector<int> const &pieces) const;
+    MergesMap _merges;
 };
