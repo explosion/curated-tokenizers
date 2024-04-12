@@ -51,7 +51,7 @@ def bytes_to_unicode() -> Dict[int, bytes]:
             bs.append(b)
             cs.append(2**8 + n)
             n += 1
-    cs = [chr(n).encode("utf-8") for n in cs]
+    cs = [chr(n) for n in cs]
     return dict(zip(bs, cs))
 
 cdef class ByteBPEProcessor:
@@ -64,13 +64,19 @@ cdef class ByteBPEProcessor:
 
     def __init__(self, vocab: Dict[str, int], merges: List[Tuple[str, str]]):
         self._byte_encoder = bytes_to_unicode()
-        self._byte_decoder = {v.decode("utf-8"): k for k, v in self._byte_encoder.items()}
+        self._byte_decoder = {v: k for k, v in self._byte_encoder.items()}
         self._split_pattern = regex.compile(SPLIT_PATTERN)
         self._piece_to_id = vocab
         self._id_to_piece = {v: k for k, v in vocab.items()}
-        cdef vector[pair[string, string]] c_merges
+        cdef vector[Merge] c_merges
+        cdef Merge merge
         for p1, p2 in merges:
-            c_merges.push_back(pair[string, string](p1.encode('utf-8'), p2.encode('utf-8')))
+            merge.merge = pair[int, int](vocab[p1], vocab[p2])
+            try:
+                merge.merged_id = vocab[p1 + p2]
+            except KeyError:
+                raise ValueError(f"Merge of '{p1}' and '{p2}' not in vocabulary")
+            c_merges.push_back(merge)
         self._merges = make_shared[Merges](c_merges)
 
     def __copy__(self):
@@ -136,8 +142,10 @@ cdef class ByteBPEProcessor:
             text: The text to split.
             RETURNS: Piece identifiers.
         """
-        pieces = self.encode_as_pieces(text)
-        return self._pieces_to_ids(pieces)
+        ids = []
+        for token in regex.findall(self._split_pattern, text):
+            ids.extend(self._encode_token_as_ids(token))
+        return ids
 
     def encode_as_pieces(self, text: str) -> List[str]:
         """
@@ -146,18 +154,23 @@ cdef class ByteBPEProcessor:
             text: The text to split.
             RETURNS: Piece pieces.
         """
-        pieces = []
-        for token in regex.findall(self._split_pattern, text):
-            token_bytes = [self._byte_encoder[b] for b in token.encode("utf-8")]
-            merged = deref(self._merges).apply_merges(token_bytes)
-            pieces.extend(merge.decode("utf-8") for merge in merged)
-        return pieces
+        ids = self.encode_as_ids(text)
+        return self._ids_to_pieces(ids)
+
+    @lru_cache(maxsize=8192)
+    def _encode_token_as_ids(self, token: str) -> List[str]:
+            try:
+                byte_ids = [self._piece_to_id[self._byte_encoder[b]] for b in token.encode("utf-8")]
+            except KeyError as e:
+                raise ValueError(f"Vocabulary does not contain byte '{e.args[0]}'")
+            return deref(self._merges).apply_merges(byte_ids)
+
 
     @property
     def merges(self) -> List[Tuple[str, str]]:
         """Get all merges."""
-        merges_bytes = deref(self._merges).merges()
-        return [(m1.decode('utf-8'), m2.decode('utf-8')) for m1, m2 in merges_bytes]
+        merges_ids = deref(self._merges).merges()
+        return [(self._id_to_piece[m1], self._id_to_piece[m2]) for m1, m2 in merges_ids]
 
     def piece_to_id(self, piece: str) -> Optional[int]:
         """Get the identifier for a piece."""
@@ -171,6 +184,16 @@ cdef class ByteBPEProcessor:
     def vocab(self) -> Dict[str, int]:
         """Get a copy of the vocabulary."""
         return dict(self._piece_to_id)
+
+    def _ids_to_pieces(self, ids):
+        pieces = []
+        for piece_id in ids:
+            piece = self._id_to_piece.get(piece_id)
+            if piece is None:
+                raise ValueError(f"Piece identifier is not in vocabulary: {piece_id}")
+            pieces.append(piece)
+
+        return pieces
 
     def _pieces_to_ids(self, pieces):
         piece_ids = []

@@ -16,9 +16,7 @@ def prefix_path(prefix, files):
     return list(map(lambda f: f"{prefix}/{f}", files))
 
 
-ABSL_SRC = prefix_path(
-    "sentencepiece/third_party/absl", ["flags/flag.cc"]
-)
+ABSL_SRC = prefix_path("sentencepiece/third_party/absl", ["flags/flag.cc"])
 
 PROTOBUF_LIGHT_SRC = prefix_path(
     "sentencepiece/third_party/protobuf-lite",

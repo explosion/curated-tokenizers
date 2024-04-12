@@ -1,17 +1,20 @@
-#include <string>
+#include <cstddef>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
 #include "merges.hh"
 
-Merges::Merges(std::vector<string_pair> const &merges) {
+Merges::Merges(std::vector<Merge> const &merges) {
     for (size_t i = 0; i < merges.size(); i++) {
-        _merges[merges[i]] = i;
+        MergeValue value;
+        value.rank = static_cast<int>(i);
+        value.merged_id = merges[i].merged_id;
+        _merges[merges[i].merge] = value;
     }
 }
 
-std::vector<std::string> Merges::apply_merges(std::vector<std::string> pieces) const {
+std::vector<int> Merges::apply_merges(std::vector<int> ids) const {
     // This function could be optimized more, e.g.:
     //
     // * Use an LRU cache for frequent inputs.
@@ -20,55 +23,57 @@ std::vector<std::string> Merges::apply_merges(std::vector<std::string> pieces) c
     //
     // But let's see if performance is actually an issue in practice.
 
-    while (pieces.size() != 1) {
-        auto best_pair = find_best_pair(pieces);
-        if (best_pair.first.empty() && best_pair.second.empty()) {
+    while (ids.size() != 1) {
+        auto iter = find_best_pair(ids);
+        if (iter == _merges.end()) {
             break;
         }
 
-        std::vector<std::string> new_pieces;
-        for (size_t i = 0; i < pieces.size();) {
-            if (i < pieces.size() - 1 && pieces[i] == best_pair.first && pieces[i+1] == best_pair.second) {
+        auto best_pair = iter->first;
+
+        std::vector<int> new_ids;
+        for (size_t i = 0; i < ids.size();) {
+            if (i < ids.size() - 1 && ids[i] == best_pair.first && ids[i+1] == best_pair.second) {
                 // Merge
-                new_pieces.emplace_back(pieces[i] + pieces[i + 1]);
+                new_ids.emplace_back(iter->second.merged_id);
                 i += 2;
             } else {
                 // Copy
-                new_pieces.emplace_back(pieces[i]);
+                new_ids.emplace_back(ids[i]);
                 ++i;
             }
 
         }
 
-        pieces = new_pieces;
+        ids = new_ids;
     }
     
-    return pieces;
+    return ids;
 }
 
-string_pair Merges::find_best_pair(std::vector<std::string> const &pieces) const {
-    string_pair best_pair;
+MergesMap::const_iterator Merges::find_best_pair(std::vector<int> const &ids) const {
+    auto best_iter = _merges.end();
     size_t best_rank = _merges.size();
-    for (size_t i = 0; i < pieces.size() - 1; ++i) {
-        auto cur_pair = std::make_pair(pieces[i], pieces[i + 1]);
+    for (size_t i = 0; i < ids.size() - 1; ++i) {
+        auto cur_pair = std::make_pair(ids[i], ids[i + 1]);
         auto iter = _merges.find(cur_pair);
         if (iter == _merges.end()) {
             continue;
         }
 
-        if (iter->second < best_rank) {
-            best_pair = cur_pair;
-            best_rank = iter->second;
+        if (iter->second.rank < best_rank) {
+            best_iter = iter;
+            best_rank = iter->second.rank;
         }
     }
 
-    return best_pair;
+    return best_iter;
 }
 
-std::vector<std::pair<std::string, std::string>> Merges::merges() const {
-    std::vector<std::pair<std::string, std::string>> merges(_merges.size());
+std::vector<merge_pair> Merges::merges() const {
+    std::vector<merge_pair> merges(_merges.size());
     for (auto const &merge: _merges) {
-        merges[merge.second] = merge.first;
+        merges[merge.second.rank] = merge.first;
     }
 
     return merges;
