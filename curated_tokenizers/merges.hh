@@ -48,7 +48,7 @@ public:
      * @param ids The ids to merge
      * @return std::vector<int> Ids after applying merges.
      */
-    std::vector<int> apply_merges(std::vector<int> pieces) const;
+    std::vector<int> apply_merges(std::vector<int> ids) const;
     
     /**
      * Get all merges used by the BBPE instance.
