@@ -57,6 +57,6 @@ public:
      */
     std::vector<merge_pair> merges() const;
 private:
-    MergesMap::const_iterator find_best_pair(std::vector<int> const &pieces) const;
+    MergesMap::const_iterator find_best_pair(std::vector<int> const &ids) const;
     MergesMap _merges;
 };
