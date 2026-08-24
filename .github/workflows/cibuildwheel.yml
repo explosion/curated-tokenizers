@@ -1,0 +1,20 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - 'release-v[0-9]+.[0-9]+.[0-9]+**'
+      - 'prerelease-v[0-9]+.[0-9]+.[0-9]+**'
+jobs:
+  build_wheels:
+    uses: explosion/gha-cibuildwheel/.github/workflows/cibuildwheel.yml@main
+    permissions:
+      contents: write
+      actions: read
+    with:
+      wheel-name-pattern: "curated_tokenizers-*.whl"
+      pure-python: false
+      # sentencepiece is vendored as a git submodule
+      submodules: recursive
+    secrets:
+      gh-token: ${{ secrets.GITHUB_TOKEN }}
