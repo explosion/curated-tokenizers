@@ -1,5 +1,5 @@
 # Build dependencies
-cython>=3.0,<3.2
+cython>=3.0,<3.4
 wheel
 
 # Runtime dependencies

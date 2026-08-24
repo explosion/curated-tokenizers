@@ -62,7 +62,16 @@ cdef class ByteBPEProcessor:
     cdef dict _piece_to_id
     cdef dict _id_to_piece
 
-    def __init__(self, vocab: Dict[str, int], merges: List[Tuple[str, str]]):
+    def __init__(self, vocab, merges):
+        """
+        Construct a byte BPE processor.
+
+        Note: the argument types (vocab: Dict[str, int],
+        merges: List[Tuple[str, str]]) are deliberately not annotated.
+        Cython 3.3 misapplies signature annotations even with
+        annotation_typing=False: it crashes on `vocab.items()` and enforces
+        tuple-ness of `merges` elements at runtime.
+        """
         self._byte_encoder = bytes_to_unicode()
         self._byte_decoder = {v: k for k, v in self._byte_encoder.items()}
         self._split_pattern = regex.compile(SPLIT_PATTERN)
@@ -208,6 +217,5 @@ cdef class ByteBPEProcessor:
     def __reduce__(self):
         return (unpickle_byte_bpe_processor, (self.vocab, self.merges,))
 
-def unpickle_byte_bpe_processor(vocab: Dict[str, int],
-                                merges: List[Tuple[str, str]]) -> ByteBPEProcessor:
+def unpickle_byte_bpe_processor(vocab, merges) -> ByteBPEProcessor:
     return ByteBPEProcessor(vocab, merges)

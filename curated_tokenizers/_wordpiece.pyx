@@ -12,7 +12,7 @@ cdef struct PieceMatch:
 cdef class WordPieceProcessor:
     cdef PieceStorage _pieces
 
-    def __init__(self, pieces: List[str]):
+    def __init__(self, pieces):  # pieces: List[str]; see note in _bbpe.pyx
         self._pieces = PieceStorage()
 
         for idx, piece in enumerate(pieces):
@@ -148,5 +148,5 @@ cdef class WordPieceProcessor:
     def __reduce__(self):
         return (unpickle_wordpiece_processor, (self.to_list(),))
 
-def unpickle_wordpiece_processor(pieces: List[str]) -> WordPieceProcessor:
+def unpickle_wordpiece_processor(pieces) -> WordPieceProcessor:
     return WordPieceProcessor(pieces)
