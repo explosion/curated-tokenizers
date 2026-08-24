@@ -1,6 +1,8 @@
 [build-system]
 requires = [
     "setuptools",
-    "cython>=0.25",
+    # Cython 3.3.0 crashes compiling _bbpe.pyx (compiler crash in
+    # OptimizeBuiltinCalls); 3.0.x and 3.1.x are verified to work.
+    "cython>=3.0,<3.2",
 ]
 build-backend = "setuptools.build_meta"
